@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chương 2 Khảo sát biến số liên tục: Mô hình hồi quy Gamma | Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R</title>
+  <meta name="description" content="Giáo trình thống kê chuyên dụng cho nghiên cứu hỗ trợ sinh sản" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chương 2 Khảo sát biến số liên tục: Mô hình hồi quy Gamma | Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Giáo trình thống kê chuyên dụng cho nghiên cứu hỗ trợ sinh sản" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chương 2 Khảo sát biến số liên tục: Mô hình hồi quy Gamma | Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R" />
+  
+  <meta name="twitter:description" content="Giáo trình thống kê chuyên dụng cho nghiên cứu hỗ trợ sinh sản" />
+  
+
+<meta name="author" content="Lê Ngọc Khả Nhi và cộng sự" />
+
+
+<meta name="date" content="2023-04-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Thống kê chuyên dụng nghiên cứu IVF</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Lời giới thiệu</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#giới-thiệu-về-nghiên-cứu-hỗ-trợ-sinh-sản"><i class="fa fa-check"></i><b>1.1</b> Giới thiệu về nghiên cứu hỗ trợ sinh sản</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#đặt-vấn-đề"><i class="fa fa-check"></i><b>1.1.1</b> Đặt vấn đề</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#lịch-sử-nghiên-cứu-về-ivf"><i class="fa fa-check"></i><b>1.1.2</b> Lịch sử nghiên cứu về IVF</a></li>
+<li class="chapter" data-level="1.1.3" data-path="index.html"><a href="index.html#xu-hướng-nghiên-cứu-ivf"><i class="fa fa-check"></i><b>1.1.3</b> Xu hướng nghiên cứu IVF</a></li>
+<li class="chapter" data-level="1.1.4" data-path="index.html"><a href="index.html#so-sánh-kết-quả-ivf-trước-và-sau-khi-có-nghiên-cứu"><i class="fa fa-check"></i><b>1.1.4</b> So sánh kết quả IVF trước và sau khi có nghiên cứu</a></li>
+<li class="chapter" data-level="1.1.5" data-path="index.html"><a href="index.html#kết-luận"><i class="fa fa-check"></i><b>1.1.5</b> Kết luận</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#giới-thiệu-về-giáo-trình"><i class="fa fa-check"></i><b>1.2</b> Giới thiệu về giáo trình</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#ý-tưởng-về-một-giáo-trình-thống-kê-chuyên-dụng-cho-nghiên-cứu-htss"><i class="fa fa-check"></i><b>1.2.1</b> Ý tưởng về một giáo trình thống kê chuyên dụng cho nghiên cứu HTSS</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#mục-tiêu-học-tập"><i class="fa fa-check"></i><b>1.2.2</b> Mục tiêu học tập</a></li>
+<li class="chapter" data-level="1.2.3" data-path="index.html"><a href="index.html#nội-dung-và-quy-ước-trình-bày"><i class="fa fa-check"></i><b>1.2.3</b> Nội dung và quy ước trình bày</a></li>
+<li class="chapter" data-level="1.2.4" data-path="index.html"><a href="index.html#nguồn-gốc-của-dữ-liệu"><i class="fa fa-check"></i><b>1.2.4</b> Nguồn gốc của dữ liệu</a></li>
+<li class="chapter" data-level="1.2.5" data-path="index.html"><a href="index.html#về-một-số-thư-viện-r-quan-trọng"><i class="fa fa-check"></i><b>1.2.5</b> Về một số thư viện R quan trọng</a></li>
+<li class="chapter" data-level="1.2.6" data-path="index.html"><a href="index.html#yêu-cầu-về-kiến-thức-và-kỹ-năng-cơ-bản"><i class="fa fa-check"></i><b>1.2.6</b> Yêu cầu về kiến thức và kỹ năng cơ bản</a></li>
+<li class="chapter" data-level="1.2.7" data-path="index.html"><a href="index.html#khả-năng-tương-thích-với-chuyên-khoa-lâm-sàng-khác"><i class="fa fa-check"></i><b>1.2.7</b> Khả năng tương thích với chuyên khoa lâm sàng khác</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><i class="fa fa-check"></i><b>2</b> Khảo sát biến số liên tục: Mô hình hồi quy Gamma</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#giới-thiệu"><i class="fa fa-check"></i><b>2.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="2.2" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#bối-cảnh-của-thí-nghiệm"><i class="fa fa-check"></i><b>2.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="2.3" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#công-cụ-cần-thiết"><i class="fa fa-check"></i><b>2.3</b> Công cụ cần thiết</a></li>
+<li class="chapter" data-level="2.4" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#chuẩn-bị-dữ-liệu"><i class="fa fa-check"></i><b>2.4</b> Chuẩn bị dữ liệu</a></li>
+<li class="chapter" data-level="2.5" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#kế-hoạch-phân-tích"><i class="fa fa-check"></i><b>2.5</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="2.6" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#phân-tích-mô-tả"><i class="fa fa-check"></i><b>2.6</b> Phân tích mô tả</a></li>
+<li class="chapter" data-level="2.7" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#biện-luận-về-tính-phù-hợp-của-phân-phối-gamma"><i class="fa fa-check"></i><b>2.7</b> Biện luận về tính phù hợp của phân phối Gamma</a></li>
+<li class="chapter" data-level="2.8" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#dựng-mô-hình-hồi-quy-với-phân-phối-gamma"><i class="fa fa-check"></i><b>2.8</b> Dựng mô hình hồi quy với phân phối Gamma</a></li>
+<li class="chapter" data-level="2.9" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#suy-diễn-thống-kê-từ-mô-hình-glm-gamma"><i class="fa fa-check"></i><b>2.9</b> Suy diễn thống kê từ mô hình GLM-Gamma</a></li>
+<li class="chapter" data-level="2.10" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#kết-luận-1"><i class="fa fa-check"></i><b>2.10</b> Kết luận</a></li>
+<li class="chapter" data-level="2.11" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#thông-điệp-rút-gọn-làm-hành-trang"><i class="fa fa-check"></i><b>2.11</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><i class="fa fa-check"></i><b>3</b> Mô tả dữ liệu đa biến: Phân tích nhân tố chính (PCA)</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#giới-thiệu-1"><i class="fa fa-check"></i><b>3.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="3.2" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#bối-cảnh-của-thí-nghiệm-1"><i class="fa fa-check"></i><b>3.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="3.3" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#công-cụ-cần-thiết-1"><i class="fa fa-check"></i><b>3.3</b> Công cụ cần thiết</a></li>
+<li class="chapter" data-level="3.4" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#xác-định-số-thành-phần-chính-tối-ưu"><i class="fa fa-check"></i><b>3.4</b> Xác định số thành phần chính tối ưu</a></li>
+<li class="chapter" data-level="3.5" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#phân-tích-pca"><i class="fa fa-check"></i><b>3.5</b> Phân tích PCA</a></li>
+<li class="chapter" data-level="3.6" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#trình-bày-kết-quả-pca-bằng-biểu-đồ-biplot"><i class="fa fa-check"></i><b>3.6</b> Trình bày kết quả PCA bằng biểu đồ Biplot</a></li>
+<li class="chapter" data-level="3.7" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#phân-tích-vai-trò-của-mỗi-biến-trong-2-thành-phần-chính"><i class="fa fa-check"></i><b>3.7</b> Phân tích vai trò của mỗi biến trong 2 thành phần chính</a></li>
+<li class="chapter" data-level="3.8" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#khảo-sát-đặc-tính-phân-phối-của-mỗi-thành-phần-chính"><i class="fa fa-check"></i><b>3.8</b> Khảo sát đặc tính phân phối của mỗi thành phần chính</a></li>
+<li class="chapter" data-level="3.9" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#kết-luận-2"><i class="fa fa-check"></i><b>3.9</b> Kết luận</a></li>
+<li class="chapter" data-level="3.10" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#thông-điệp-rút-gọn-làm-hành-trang-1"><i class="fa fa-check"></i><b>3.10</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><i class="fa fa-check"></i><b>4</b> Khảo sát kết cục số đếm: Hồi quy Negative Binomial</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#giới-thiệu-2"><i class="fa fa-check"></i><b>4.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="4.2" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#bối-cảnh-của-thí-nghiệm-2"><i class="fa fa-check"></i><b>4.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="4.3" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#kế-hoạch-phân-tích-1"><i class="fa fa-check"></i><b>4.3</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="4.4" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#công-cụ-cần-thiết-2"><i class="fa fa-check"></i><b>4.4</b> Công cụ cần thiết</a></li>
+<li class="chapter" data-level="4.5" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#thống-kê-mô-tả"><i class="fa fa-check"></i><b>4.5</b> Thống kê mô tả</a></li>
+<li class="chapter" data-level="4.6" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#biện-luận-về-tính-phù-hợp-của-quy-luật-phân-phối-nbi"><i class="fa fa-check"></i><b>4.6</b> Biện luận về tính phù hợp của quy luật phân phối NBI</a></li>
+<li class="chapter" data-level="4.7" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#phân-tích-hồi-quy-bằng-mô-hình-glm-nbi"><i class="fa fa-check"></i><b>4.7</b> Phân tích hồi quy bằng mô hình GLM NBI</a></li>
+<li class="chapter" data-level="4.8" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#diễn-đạt-kết-quả-phân-tích"><i class="fa fa-check"></i><b>4.8</b> Diễn đạt kết quả phân tích</a></li>
+<li class="chapter" data-level="4.9" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#thông-điệp-rút-gọn-làm-hành-trang-2"><i class="fa fa-check"></i><b>4.9</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html"><i class="fa fa-check"></i><b>5</b> Phân tích mạng lưới tương quan</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#giới-thiệu-3"><i class="fa fa-check"></i><b>5.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="5.2" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#bối-cảnh-thí-nghiệm"><i class="fa fa-check"></i><b>5.2</b> Bối cảnh thí nghiệm</a></li>
+<li class="chapter" data-level="5.3" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#thăm-dò-dữ-liệu"><i class="fa fa-check"></i><b>5.3</b> Thăm dò dữ liệu</a></li>
+<li class="chapter" data-level="5.4" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#ma-trận-tương-quan"><i class="fa fa-check"></i><b>5.4</b> Ma trận tương quan</a></li>
+<li class="chapter" data-level="5.5" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#sơ-đồ-mạng-lưới-tương-quan"><i class="fa fa-check"></i><b>5.5</b> Sơ đồ mạng lưới tương quan</a></li>
+<li class="chapter" data-level="5.6" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#phân-tích-cấu-trúc-mạng-lưới-tương-quan"><i class="fa fa-check"></i><b>5.6</b> Phân tích cấu trúc mạng lưới tương quan</a></li>
+<li class="chapter" data-level="5.7" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#yếu-tố-mỹ-thuật"><i class="fa fa-check"></i><b>5.7</b> Yếu tố mỹ thuật</a></li>
+<li class="chapter" data-level="5.8" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#thông-điệp-rút-gọn-làm-hành-trang-3"><i class="fa fa-check"></i><b>5.8</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><i class="fa fa-check"></i><b>6</b> Khảo sát kết cục là tỷ lệ: Hồi quy Binomial</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#giới-thiệu-4"><i class="fa fa-check"></i><b>6.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="6.2" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#bối-cảnh-của-thí-nghiệm-3"><i class="fa fa-check"></i><b>6.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="6.3" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#công-cụ-cần-thiết-cho-quy-trình"><i class="fa fa-check"></i><b>6.3</b> Công cụ cần thiết cho quy trình</a></li>
+<li class="chapter" data-level="6.4" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#chuẩn-bị-dữ-liệu-1"><i class="fa fa-check"></i><b>6.4</b> Chuẩn bị dữ liệu</a></li>
+<li class="chapter" data-level="6.5" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#kế-hoạch-phân-tích-2"><i class="fa fa-check"></i><b>6.5</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="6.6" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#thống-kê-mô-tả-1"><i class="fa fa-check"></i><b>6.6</b> Thống kê mô tả</a></li>
+<li class="chapter" data-level="6.7" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#dựng-mô-hình-hồi-quy-glm-binomial"><i class="fa fa-check"></i><b>6.7</b> Dựng mô hình hồi quy GLM Binomial</a></li>
+<li class="chapter" data-level="6.8" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#suy-diễn-thống-kê"><i class="fa fa-check"></i><b>6.8</b> Suy diễn thống kê</a></li>
+<li class="chapter" data-level="6.9" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#thông-điệp-rút-gọn-làm-hành-trang-4"><i class="fa fa-check"></i><b>6.9</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><i class="fa fa-check"></i><b>7</b> Thí nghiệm khảo sát lặp lại: Mô hình GEE</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#giới-thiệu-5"><i class="fa fa-check"></i><b>7.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="7.2" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#bối-cảnh-của-thí-nghiệm-4"><i class="fa fa-check"></i><b>7.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="7.3" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#công-cụ-cho-quy-trình"><i class="fa fa-check"></i><b>7.3</b> Công cụ cho quy trình</a></li>
+<li class="chapter" data-level="7.4" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#thống-kê-mô-tả-2"><i class="fa fa-check"></i><b>7.4</b> Thống kê mô tả</a></li>
+<li class="chapter" data-level="7.5" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#phân-tích-bài-toán"><i class="fa fa-check"></i><b>7.5</b> Phân tích bài toán</a></li>
+<li class="chapter" data-level="7.6" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#giới-thiệu-về-mô-hình-gee"><i class="fa fa-check"></i><b>7.6</b> Giới thiệu về mô hình GEE</a></li>
+<li class="chapter" data-level="7.7" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#dựng-mô-hình-gee"><i class="fa fa-check"></i><b>7.7</b> Dựng mô hình GEE</a></li>
+<li class="chapter" data-level="7.8" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#diễn-giải-kết-quả-mô-hình-gee"><i class="fa fa-check"></i><b>7.8</b> Diễn giải kết quả mô hình GEE</a></li>
+<li class="chapter" data-level="7.9" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#diễn-đạt-kết-quả-của-phân-tích"><i class="fa fa-check"></i><b>7.9</b> Diễn đạt kết quả của phân tích:</a></li>
+<li class="chapter" data-level="7.10" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#thông-điệp-rút-gọn-làm-hành-trang-5"><i class="fa fa-check"></i><b>7.10</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><i class="fa fa-check"></i><b>8</b> Khảo sát kết cục nhị phân: Hồi quy logistic</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#giới-thiệu-6"><i class="fa fa-check"></i><b>8.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="8.2" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#bối-cảnh-của-thí-nghiệm-5"><i class="fa fa-check"></i><b>8.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="8.3" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#kế-hoạch-phân-tích-3"><i class="fa fa-check"></i><b>8.3</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="8.4" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#công-cụ-cần-thiết-cho-quy-trình-1"><i class="fa fa-check"></i><b>8.4</b> Công cụ cần thiết cho quy trình</a></li>
+<li class="chapter" data-level="8.5" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#chuẩn-bị-dữ-liệu-2"><i class="fa fa-check"></i><b>8.5</b> Chuẩn bị dữ liệu</a></li>
+<li class="chapter" data-level="8.6" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#phân-tích-mô-tả-1"><i class="fa fa-check"></i><b>8.6</b> Phân tích mô tả</a></li>
+<li class="chapter" data-level="8.7" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#lý-thuyết-về-mô-hình-hồi-quy-logistic"><i class="fa fa-check"></i><b>8.7</b> Lý thuyết về mô hình hồi quy logistic</a></li>
+<li class="chapter" data-level="8.8" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#mô-hình-hồi-quy-logistic-cho-biến-kết-quả-nhị-giá"><i class="fa fa-check"></i><b>8.8</b> Mô hình hồi quy Logistic cho biến kết quả nhị giá</a></li>
+<li class="chapter" data-level="8.9" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#mô-hình-hồi-quy-binomial-cho-tỷ-lệ-optổng-số-phôi"><i class="fa fa-check"></i><b>8.9</b> Mô hình hồi quy Binomial cho tỷ lệ OP/tổng số phôi</a></li>
+<li class="chapter" data-level="8.10" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#diễn-giải-kết-quả-của-phân-tích"><i class="fa fa-check"></i><b>8.10</b> Diễn giải kết quả của phân tích</a></li>
+<li class="chapter" data-level="8.11" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#thông-điệp-rút-gọn-làm-hành-trang-6"><i class="fa fa-check"></i><b>8.11</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><i class="fa fa-check"></i><b>9</b> Ứng dụng sơ đồ mạng định hướng không tuần hoàn (DAG)</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#đặt-vấn-đề-1"><i class="fa fa-check"></i><b>9.1</b> Đặt vấn đề</a></li>
+<li class="chapter" data-level="9.2" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#bối-cảnh-của-thí-nghiệm-6"><i class="fa fa-check"></i><b>9.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="9.3" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#kế-hoạch-phân-tích-4"><i class="fa fa-check"></i><b>9.3</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="9.4" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#mô-tả-đơn-giản"><i class="fa fa-check"></i><b>9.4</b> Mô tả đơn giản</a></li>
+<li class="chapter" data-level="9.5" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#sơ-đồ-nhân-quả-và-mô-hình-dag"><i class="fa fa-check"></i><b>9.5</b> Sơ đồ nhân quả và mô hình DAG</a></li>
+<li class="chapter" data-level="9.6" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#xác-định-tập-hợp-biến-cần-hiệu-chỉnh"><i class="fa fa-check"></i><b>9.6</b> Xác định tập hợp biến cần hiệu chỉnh</a></li>
+<li class="chapter" data-level="9.7" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#ước-lượng-bằng-mô-hình-hồi-quy-logistic"><i class="fa fa-check"></i><b>9.7</b> Ước lượng bằng mô hình hồi quy logistic</a></li>
+<li class="chapter" data-level="9.8" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#thông-điệp-rút-gọn-làm-hành-trang-7"><i class="fa fa-check"></i><b>9.8</b> Thông điệp rút gọn làm hành trang:</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html"><i class="fa fa-check"></i><b>10</b> Mô hình Machine learning khả diễn</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#giới-thiệu-7"><i class="fa fa-check"></i><b>10.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="10.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#bối-cảnh-của-thí-nghiệm-7"><i class="fa fa-check"></i><b>10.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="10.3" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#kế-hoạch-phân-tích-5"><i class="fa fa-check"></i><b>10.3</b> Kế hoạch phân tích:</a></li>
+<li class="chapter" data-level="10.4" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#chuẩn-bị-và-thăm-dò-dữ-liệu"><i class="fa fa-check"></i><b>10.4</b> Chuẩn bị và thăm dò dữ liệu</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#các-thông-số-định-tính-rời-rạc"><i class="fa fa-check"></i><b>10.4.1</b> Các thông số định tính, rời rạc</a></li>
+<li class="chapter" data-level="10.4.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#các-biến-số-liên-tục"><i class="fa fa-check"></i><b>10.4.2</b> Các biến số liên tục</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#phân-chia-dữ-liệu"><i class="fa fa-check"></i><b>10.5</b> Phân chia dữ liệu</a></li>
+<li class="chapter" data-level="10.6" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#thiết-lập-mô-hình-phân-loại"><i class="fa fa-check"></i><b>10.6</b> Thiết lập mô hình phân loại</a>
+<ul>
+<li class="chapter" data-level="10.6.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#bước-3a-công-đoạn-sơ-chế-dữ-liệu"><i class="fa fa-check"></i><b>10.6.1</b> Bước 3a) Công đoạn sơ chế dữ liệu</a></li>
+<li class="chapter" data-level="10.6.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#khởi-tạo-mô-hình-xgboost"><i class="fa fa-check"></i><b>10.6.2</b> Khởi tạo mô hình XGBoost</a></li>
+<li class="chapter" data-level="10.6.3" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#tạo-workflow"><i class="fa fa-check"></i><b>10.6.3</b> Tạo workflow</a></li>
+<li class="chapter" data-level="10.6.4" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#thực-hiện-kiểm-định-chéo-lặp-lại-10x10"><i class="fa fa-check"></i><b>10.6.4</b> Thực hiện kiểm định chéo lặp lại 10x10</a></li>
+</ul></li>
+<li class="chapter" data-level="10.7" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#các-tiêu-chí-hiệu-năng-mô-hình-phân-loại-nhị-phân"><i class="fa fa-check"></i><b>10.7</b> Các tiêu chí hiệu năng mô hình phân loại nhị phân</a></li>
+<li class="chapter" data-level="10.8" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#huấn-luyện-mô-hình-trên-toàn-thể-dữ-liệu-tập-train"><i class="fa fa-check"></i><b>10.8</b> Huấn luyện mô hình trên toàn thể dữ liệu tập Train</a></li>
+<li class="chapter" data-level="10.9" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#kiểm-định-độc-lập-hiệu-năng-mô-hình"><i class="fa fa-check"></i><b>10.9</b> Kiểm định độc lập hiệu năng mô hình</a></li>
+<li class="chapter" data-level="10.10" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#phân-tích-hậu-kiểm-bằng-kỹ-thuật-shap"><i class="fa fa-check"></i><b>10.10</b> Phân tích hậu kiểm bằng kỹ thuật SHAP</a>
+<ul>
+<li class="chapter" data-level="10.10.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#giới-thiệu-về-phương-pháp-diễn-giải-mô-hình-shap"><i class="fa fa-check"></i><b>10.10.1</b> Giới thiệu về phương pháp diễn giải mô hình SHAP</a></li>
+</ul></li>
+<li class="chapter" data-level="10.11" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#vai-trò-của-các-thông-số-đóng-góp-vào-kết-quả-tiên-lượng"><i class="fa fa-check"></i><b>10.11</b> Vai trò của các thông số đóng góp vào kết quả tiên lượng</a>
+<ul>
+<li class="chapter" data-level="10.11.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#shap-score-có-thể-dùng-để-phân-cụm-dữ-liệu"><i class="fa fa-check"></i><b>10.11.1</b> SHAP score có thể dùng để phân cụm dữ liệu</a></li>
+</ul></li>
+<li class="chapter" data-level="10.12" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#bàn-luận"><i class="fa fa-check"></i><b>10.12</b> Bàn luận:</a>
+<ul>
+<li class="chapter" data-level="10.12.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#ưu-điểm-và-nhược-điểm-của-mô-hình-xgboost"><i class="fa fa-check"></i><b>10.12.1</b> Ưu điểm và nhược điểm của mô hình XGboost</a></li>
+<li class="chapter" data-level="10.12.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#ưu-điểm-và-nhược-điểm-của-kỹ-thuật-shap"><i class="fa fa-check"></i><b>10.12.2</b> Ưu điểm và nhược điểm của kỹ thuật SHAP</a></li>
+<li class="chapter" data-level="10.12.3" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#diễn-giải-cơ-chế-hoạt-động-của-mô-hình-ở-cấp-độ-cá-thể"><i class="fa fa-check"></i><b>10.12.3</b> Diễn giải cơ chế hoạt động của mô hình ở cấp độ cá thể:</a></li>
+</ul></li>
+<li class="chapter" data-level="10.13" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#kết-luận-3"><i class="fa fa-check"></i><b>10.13</b> Kết luận</a></li>
+<li class="chapter" data-level="10.14" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#thông-điệp-rút-gọn-làm-hành-trang-8"><i class="fa fa-check"></i><b>10.14</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/kinokoberuji/OGStats" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chương 2</span> Khảo sát biến số liên tục: Mô hình hồi quy Gamma<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><strong>Biên soạn:</strong> Lê Ngọc Khả Nhi, Dương Thị Ngọc Châu</p>
+<div id="giới-thiệu" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Giới thiệu<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#giới-thiệu" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Ta sẽ khởi hành bằng một vấn đề thường gặp trong nghiên cứu y học lâm sàng, đó là bài toán so sánh giá trị một đại lượng giữa nhiều phân nhóm độc lập. Trong nghiên cứu hỗ trợ sinh sản, bài toàn này được đặt ra khi đối tượng khảo sát là các loại hormone như AMH, LH, FSH, E2… được định lượng ở điều kiện cơ bản hoặc tại một thời điểm trong quá trình can thiệp, và thiết kế nghiên cứu nhằm so sánh giữa nhiều loại phác đồ can thiệp hoặc các phân nhóm lâm sàng khác nhau.</p>
+<p>Giải pháp thường quy chúng ta hay dùng là phân tích phương sai một yếu tố (đơn biến) (One-way ANOVA). Tuy nhiên, ANOVA cổ điển lại dựa trên điều kiện giả định về tính chất phân phối chuẩn của dữ liệu và giả định này hiếm khi nào phù hợp với thực tiễn, vì hầu hết những đại lượng y sinh học trong tự nhiên đều có phân phối lệch dương.</p>
+<p>Trong chương này, các bạn sẽ được giới thiệu về một giải pháp linh hoạt và phổ quát hơn cho bài toán so sánh giá trị trung bình của biến định lượng giữa nhiều phân nhóm độc lập, đó là mô hình tuyến tính tỗng quát (Generalized linear model, GLM) với phân phối Gamma.</p>
+</div>
+<div id="bối-cảnh-của-thí-nghiệm" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Bối cảnh của thí nghiệm<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#bối-cảnh-của-thí-nghiệm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Thí dụ minh họa sử dụng dataset “Five_protocols.csv” từ một nghiên cứu có thực trên 1005 phụ nữ được thực hiện thụ tinh nhân tạo. Mục tiêu đặt ra là khảo sát giá trị hormone LH ở ngày trigger (biến LH) giữa 5 loại phác đồ kích thích buồng trứng (biến Protocol), gồm:</p>
+<ul>
+<li>Mild = mild stimulation sử dụng Letrozole,</li>
+<li>GnRH_ant = Phác đồ đối vận GnRH,</li>
+<li>Fol_long = Follicular long acting,</li>
+<li>PPOS: Progestin-Primed Ovarian Stimulation,</li>
+<li>Lut_short = Lutean phase short acting.</li>
+</ul>
+</div>
+<div id="công-cụ-cần-thiết" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Công cụ cần thiết<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#công-cụ-cần-thiết" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Quy trình phân tích cần những công cụ sau đây:</p>
+<ul>
+<li><p>Hệ sinh thái tidyverse <span class="citation">(<a href="#ref-tidyverse">Wickham et al. 2019</a>)</span>: với thư viện ggplot2 cho đồ họa thống kê và dplyr để thao tác dữ liệu</p></li>
+<li><p>Thư viện ggridges <span class="citation">(<a href="#ref-ggridges">Wilke 2022</a>)</span>: để vẽ biểu đổ mật độ phân phối riêng cho từng phân nhóm (ggplot2 cơ bản không hỗ trợ loại biểu đồ này).</p></li>
+<li><p>Thư viện fitdistrplus <span class="citation">(<a href="#ref-fitdistrplus">Delignette-Muller and Dutang 2015</a>)</span> cho phép kiểm tra tính phù hợp giữa dữ liệu thực nghiệm và một quy luật phân phối xác suất lý thuyết, như Gaussian hoặc Gamma.</p></li>
+<li><p>Thư viện gamlss <span class="citation">(<a href="#ref-gamlss1">R. A. Rigby and Stasinopoulos 2005</a>)</span>: cho phép khớp các mô hình hồi quy cho nhiều họ phân phối khác nhau, bao gồm Gamma.</p></li>
+<li><p>Thư viện broom <span class="citation">(<a href="#ref-broom">D. R. et al. 2023</a>)</span>: cho phép thao tác trên kết quả mô hình hồi quy gamlss.</p></li>
+<li><p>Thư viện marginaleffects <span class="citation">(<a href="#ref-marginal">Vincent Arel-Bundock 2023</a>)</span>: dùng cho phân tích hậu kiểm (post-hoc analysis) trên kết quả mô hình hồi quy gamlss</p></li>
+</ul>
+</div>
+<div id="chuẩn-bị-dữ-liệu" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> Chuẩn bị dữ liệu<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#chuẩn-bị-dữ-liệu" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Dữ liệu được lưu ở định dạng .csv với dấu ngăn cách là “;” và dấu thập phân là “.”</p>
+<ol style="list-style-type: decimal">
+<li><p>Ta dùng hàm read.csv để tải dữ liệu vào R và lưu trong dataframe df.</p></li>
+<li><p>Dùng hàm na.omit() để loại bỏ những đơn vị quan sát bị thiếu sót dữ liệu (missing value)</p></li>
+<li><p>Chuyển Protocol từ 1 biến kiểu kí tự (character) thành factor, để tương thích với quy trình phân tích.</p></li>
+</ol>
+<p>Dữ liệu đầu vào có cấu trúc gồm 1 biến kết quả (LH) thuộc loại định lượng liên tục (kiểu dữ liệu double, numeric, int) và 1 biến phân nhóm (Protocol) thuộc loại định tính rời rạc (định dạng character hoặc factor). Lưu ý, phân phối Gamma có miền xác định là tập số thực dương R+, nên trong dữ liệu, giá trị biến kết quả (LH) không được có giá trị &lt; 0 hoặc = 0.</p>
+<p>Một cách mặc định, biến rời rạc loại factor sẽ được phân cấp theo thứ tự alphabet, mỗi bậc giá trị sẽ tương ứng với số thứ tự. Trong trường hợp này, thứ tự các loại protocol là:</p>
+<p>1 = Fol_long (sẽ được xem là nhóm tham chiếu khi phân tích hồi quy)</p>
+<p>2 = GnRH_ant</p>
+<p>3 = Lut_short</p>
+<p>4 = Mild</p>
+<p>5 = PPOS</p>
+<pre><code>## [1] &quot;Fol_long&quot;  &quot;GnRH_ant&quot;  &quot;Lut_short&quot; &quot;Mild&quot;      &quot;PPOS&quot;</code></pre>
+</div>
+<div id="kế-hoạch-phân-tích" class="section level2 hasAnchor" number="2.5">
+<h2><span class="header-section-number">2.5</span> Kế hoạch phân tích<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#kế-hoạch-phân-tích" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Một quy trình phân tích gồm 4 bước sẽ được tiến hành nhằm giải đáp câu hỏi nghiên cứu đã đặt ra:</p>
+<ol style="list-style-type: decimal">
+<li><p>Đặc tính phân bố của giá trị LH ở 5 nhóm phác đồ sẽ được mô tả bằng trung bình, độ lệch chuẩn, trung vị và bách phân vị 5-95, đồng thời trình bày trực quan bằng biểu đồ mật độ phân bố (Kernel density plot) hoặc Boxplot, violin plot.</p></li>
+<li><p>Dữ liệu LH sẽ được khớp lần lượt với 2 quy luật phân phối Gamma và Gaussian, sau đó đối chiếu đồ thị hàm PDF và CDF để xác nhận tính phù hợp tốt hơn của phân phối Gamma so với Gaussian.</p></li>
+<li><p>Mô hình hồi quy tuyến tính tổng quát với phân phối Gamma sẽ được áp dụng để khảo sát giá trị trung bình LH giữa 5 phác đồ.</p></li>
+<li><p>Hậu kiểm so sánh bắt cặp tuần tự nhằm kiểm tra một loạt giả định về sự khác biệt của giá trị LH giữa các nhóm phác đồ.</p></li>
+</ol>
+<p>Suy diễn thống kê dựa trên kiểm định giả thuyết vô hiệu với ngưỡng ý nghĩa thống kê p = 0.05. Hiệu chỉnh Bonferroni được áp dụng khi kiểm tra hàng loạt giả định.</p>
+</div>
+<div id="phân-tích-mô-tả" class="section level2 hasAnchor" number="2.6">
+<h2><span class="header-section-number">2.6</span> Phân tích mô tả<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#phân-tích-mô-tả" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Mục tiêu của công đoạn này nhằm thăm dò và mô tả sơ khởi về đặc tính phân phối của LH giữa các nhóm phác đồ khác nhau. Nhận định rút ra từ phân tích mô tả này cho phép đặt ra những giả thuyết cần chứng minh và đề xuất hướng phân tích phù hợp.</p>
+<p><strong>1) Dựng bảng thống kê mô tả</strong></p>
+<ul>
+<li><p>Ta sử dụng hàm group_by của thư viện dplyr để phân chia dữ liệu thành 5 phần, tương ứng 5 bậc giá trị của biến Protocol</p></li>
+<li><p>Áp dụng hàm summarize của thư viện dplyr để tính mean, sd, median, p5, p95, min và max của LH cho mỗi nhóm nhỏ</p></li>
+<li><p>Dùng hàm arrange của dplyr để xếp thứ tự theo giá trị trung bình LH tăng dần</p></li>
+</ul>
+<p>Kết quả như sau:</p>
+<p>Theo kết quả này, có sự khác biệt về giá trị LH trung bình giữa 5 phác đồ. Một cách cụ thể, LH trung bình có khuynh hướng tăng dần theo thứ tự:</p>
+<p>Fol_long &lt; Short &lt; PPOS &lt; GnRH_ant &lt; Mild</p>
+<p><strong>2) So sánh trực quan bằng biểu đồ</strong></p>
+<p>Ta sẽ sử dụng 2 loại biểu đồ cho phép so sánh đặc điểm phân bố của LH giữa 5 phác đồ, đó là biểu đồ mật độ phân phối 1 chiều (density plot) hoặc biểu đồ hộp (boxplot).</p>
+<p>Đầu tiên, ta tạo dataframe med_df trình bày giá trị trung bình của LH giữa 5 phân nhóm, sử dụng kết hợp 2 hàm group_by và summarize_at. Dataframe này sẽ được dùng để vẽ biểu đồ tuyến kí và định vị trung bình LH cho mỗi nhóm.</p>
+<p>Tiếp theo, ta lần lượt dùng các hàm:</p>
+<ul>
+<li><p>geom_density_ridges (data = df) để vẽ 5 biểu đồ density plot cho LH ở 5 nhóm, màu nền theo nhóm phác đồ. Lưu ý rằng hàm geom_density_ridges mặc định trục x = biến định lượng, y = phân nhóm.</p></li>
+<li><p>geom_path cho med_df để vẽ biểu đồ tuyến kí nối các điểm giá trị LH trung bình;</p></li>
+<li><p>geom_point cho med_df để chấm 5 điểm giá trị LH trung bình</p></li>
+</ul>
+<p>Lưu ý rằng trục X luôn là LH, y luôn là Protocol cho 3 hàm trên</p>
+<p>Sau đó, dùng hàm coord_flip() để xoay trục 90°, như vậy trục x và y sẽ hoán chuyển cho nhau, hình ảnh sẽ biểu diễn theo chiều dọc thay vì chiều ngang.</p>
+<p>Hàm scale_x_continuous cho phép tùy chỉnh thang đo trục X, ở đây giới hạn limits từ -0.5 đến 40, mốc thang đo 5 đon vị</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+Kết quả thu được là 5 biểu đồ mật độ phân bố như trong hình. Các biểu đồ này có bản chất là đồ thị hàm probability desity (PDF) của biến LH, trục Y tương ứng với thang đo của LH). Chúng mô tả đặc tính phân phối của LH trong 5 nhóm phác đồ (trục X). Các chấm màu đen tương ứng với giá trị trung bình LH ở mỗi nhóm, được nối với nhau bằng các đoạn thẳng thể hiện khuynh hướng tăng/giảm của giá trị này. Lưu ý rằng thứ tự phân nhóm được xếp theo chiều tăng dần của LH trung bình.</p>
+<p>Dựa vào hình ảnh này, ta có thể rút ra được hai thông tin: thứ nhất, có sự khác biệt rõ nét, không chỉ về giá trị trung bình nhưng còn về đặc tính phân phối của LH, thí dụ độ phân tán, độ lệch… giữa 5 nhóm. Thứ hai là ở mỗi phân nhóm, LH chắc chắn không thể phù hợp với quy luật phân phối chuẩn (Gaussian). Phân phối của LH không đối xứng, thậm chí có độ lệch rất cao ở các nhóm GnRh_ant, Mild và PPOS.</p>
+<p>Ta có thể làm tương tự để tạo ra biểu đổ boxplot, chỉ cần thay hàm geom_density_ridges bằng hàm geom_boxplot. Lưu ý rằng với dạng biểu đồ boxplot mặc định thì trục x chỉ Protocol, còn trục y cho LH, ta vẫn dùng hàm coord_flip() để xoay trục, trình bày theo phương ngang, vì khả năng so sánh bằng thị giác sẽ tốt hơn theo chiều ngang so với chiều dọc.</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+Biểu đồ boxplot trình bày các trị số thống kê mô tả đại diện gồm trung vị, tứ phân vị (phân vị thứ 25, 50, 75), các chấm tròn nhỏ là những giá trị vượt ra khỏi khoảng tứ phân vị. Chấm màu đen lớn nhất là vị trí của trung bình. Tuy không mô tả hình ảnh của toàn thể mật độ phân phối, biểu đồ Boxplot vừa đủ để cho ta thấy cùng những thông tin về sự tương phản rõ nét giữa 5 phân nhóm, ta cũng cảm nhận được LH không có phân phối chuẩn (trung vị không trùng với trung bình, 2 đầu boxplot không cân xứng, những giá trị cao lệch hẳn về chiều dương của thang đo LH…).</p>
+</div>
+<div id="biện-luận-về-tính-phù-hợp-của-phân-phối-gamma" class="section level2 hasAnchor" number="2.7">
+<h2><span class="header-section-number">2.7</span> Biện luận về tính phù hợp của phân phối Gamma<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#biện-luận-về-tính-phù-hợp-của-phân-phối-gamma" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Mục tiêu của công đoạn này nhằm chứng minh rằng để ước lượng giá trị LH thì phân phối Gamma phù hợp hơn so với phân phối Gaussian. Điều này có thể cần thiết khi bạn phải thuyết phục những đồng nghiệp khác trong nhóm nghiên cứu về lựa chọn phương pháp của mình. Nội dung này cũng có thể được đưa vào phần phụ lục (Supplemental data) trong bài báo khoa học.</p>
+<p>Về mặt lý thuyết, ta hoàn toàn có thể chọn quy luật phân phối Gamma cho biến LH vì những lý do sau: Thang đo LH có giá trị &gt;0, phân phối của LH có hình ảnh bất đối xứng và lệch dương.</p>
+<p>Tuy nhiên, ta có thể dựa vào chứng cứ xác thực hơn bằng quy trình sau:</p>
+<ol style="list-style-type: decimal">
+<li><p>Đầu tiên, ta dùng hàm fitfist để lần lượt khớp dữ liệu LH với 2 quy luật phân phối Gaussian và Gamma,</p></li>
+<li><p>Sau đó đối chiếu hình ảnh đồ thị hàm PDF và CDF so với dữ liệu thực nghiệm, bằng 2 hàm denscomp và cdfcomp:</p></li>
+</ol>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+Chú thích: Biểu đồ trên cho phép đối chiếu đồ thị hàm PDF (mật độ xác suất) của 2 phân phối Gaussian (màu xanh), Gamma (màu đỏ) với hình ảnh biểu đồ tần suất trên thực nghiệm (màu xám).</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+Chú thích: Biểu đồ trên cho phép đối chiếu đồ thị hàm CDF (mật độ xác suất tích lũy) của 2 phân phối Gaussian (màu xanh), Gamma (màu đỏ) với hàm CDF trên thực nghiệm (màu xám).</p>
+<p>Cả 2 kết quả này đều cho thấy phân phối Gamma thích hợp hơn so với phân phối Gaussian để ước lượng giá trị LH, vì hàm PDF và CDF của phân phối Gamma phù hợp hơn với dữ liệu thực nghiệm.</p>
+<p>Lợi ích của việc chọn quy luật phân phối đúng cho biến kết quả mô hình hồi quy, đó là nó cho phép ước lượng và suy luận thống kê chính xác hơn, phù hợp thực tế hơn. Vì suy luận thống kê của chúng ta dựa vào mô hình hồi quy, mà mô hình này nhằm ước lượng giá trị trung bình của LH tại mỗi phân nhóm, vị trí trung bình của phân phối Gamma và Gaussian có thể khác nhau dẫn đến kết quả hiệu ứng tìm được cao hơn hay thấp hơn so với thực tế. Ngoài ra, phân phối Gaussian không có giới hạn về giá trị biến kết quả (nó dao động tự do trong tập R), nên mô hình hoàn toàn có thể cho ra kết quả &lt;0 là trái với hiện thực.</p>
+</div>
+<div id="dựng-mô-hình-hồi-quy-với-phân-phối-gamma" class="section level2 hasAnchor" number="2.8">
+<h2><span class="header-section-number">2.8</span> Dựng mô hình hồi quy với phân phối Gamma<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#dựng-mô-hình-hồi-quy-với-phân-phối-gamma" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Như đã trình bày trong kế hoạch phân tích, công cụ thống kê chính mà ta sử dụng là một mô hình hồi quy tuyến tính tổng quát (GLM) <span class="citation">(<a href="#ref-nelder1972">Nelder and Wedderburn 1972</a>)</span>. Hệ thống mô hình GLM do 2 nhà thống kê John Nelder và Robert Wedderburn thiết lập vào năm 1972 cho phép ước lượng giá trị của biến kết quả theo nhiều quy luật phân phối đa dạng.</p>
+<p>Một cách tổng quát, mô hình GLM ước lượng giá trị trung bình (tham số <span class="math inline">\(\mu\)</span>) của biến ngẫu nhiên Y, điều kiện hóa theo một tập biến X thông qua một hàm liên kết <span class="math inline">\(g\)</span> và một mô hình hồi tuyến tính <span class="math inline">\(X\beta\)</span>.</p>
+<p><span class="math display">\[E(Y|X) = \mu_{Y} \sim g^{-1}(X\beta)\]</span>
+Trong bài toán hiện thời, biến kết quả Y là giá trị của LH ngày trigger, được giả định là một biến ngẫu nhiên theo quy luật phân phối Gamma <span class="citation">(<a href="#ref-rigby2020">Robert A. Rigby 2020</a>)</span> với 2 tham số <span class="math inline">\(\mu\)</span> và <span class="math inline">\(\sigma\)</span></p>
+<p>Hàm mật độ phân phối (PDF) của phân phối Gamma được xác định như sau:</p>
+<p><span class="math display">\[f(y|\mu ,\sigma)=\frac{1}{\left ( \sigma ^{2} \mu \right )^{1/\sigma^{2}}}\frac{y^{\frac{1}{\sigma ^{2}}-1}e^{-y/(\sigma ^{2}\mu )}}{\Gamma \left ( 1/\sigma^{2} \right )}\]</span>
+<span class="math inline">\(\mu\)</span> có ý nghĩa như trọng tâm (central tendency) hay giá trị trung bình của biến kết quả cần ước lượng, còn giá trị của <span class="math inline">\(\sigma\)</span> tương ứng với mức độ phân tán và xác định hình ảnh của hàm mật độ phân phối. Một khi có mu và sigma, có thể ước tính độ lệch chuẩn (và phương sai) của LH theo công thức:</p>
+<p><span class="math display">\[SD = \sigma * \mu\]</span></p>
+<p>Phân tích hồi quy Gamma dùng thư viện gamlss <span class="citation">(<a href="#ref-stasinopoulos2017">Stasinopoulos 2017</a>)</span>. Đầu tiên, ta khớp một mô hình hồi quy Gamma chỉ chứa Intercept. Mô hình này tương ứng với việc ước lượng giá trị trung bình của LH cho toàn bộ mẫu khảo sát, không phân biệt nhóm phác đồ nào.</p>
+<p>Ta dùng hàm gamlss, với công thức formula = LH ~ 1, và family = GA</p>
+<p>Ta sẽ dùng mô hình cơ bản này để làm tham chiếu và so sánh với mô hình chính trong phân tích, nhằm chứng minh rằng yếu tố chia nhóm theo phác đồ thực sự có ảnh hưởng đến giá trị trung bình LH.</p>
+<p>Nội dung mô hình cơ bản (chỉ chứa Intercept, ước lượng LH trung bình cho toàn quần thể) có nội dung như sau:</p>
+<pre><code>## ******************************************************************
+## Family:  c(&quot;GA&quot;, &quot;Gamma&quot;) 
+## 
+## Call:  gamlss(formula = LH ~ 1, family = GA, data = df, trace = F,  
+##     parallel = &quot;multicore&quot;, ncpus = nC) 
+## 
+## Fitting method: RS() 
+## 
+## ------------------------------------------------------------------
+## Mu link function:  log
+## Mu Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.49042    0.03189   46.73   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ------------------------------------------------------------------
+## Sigma link function:  log
+## Sigma Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  0.01101    0.01960   0.561    0.575
+## 
+## ------------------------------------------------------------------
+## No. of observations in the fit:  1005 
+## Degrees of Freedom for the fit:  2
+##       Residual Deg. of Freedom:  1003 
+##                       at cycle:  2 
+##  
+## Global Deviance:     5005.425 
+##             AIC:     5009.425 
+##             SBC:     5019.251 
+## ******************************************************************</code></pre>
+<p>gamlss dựng 2 mô hình hồi quy riêng cho <span class="math inline">\(\mu\)</span> và <span class="math inline">\(\sigma\)</span>, cả 2 mô hình đều sử dụng hàm liên kết là logarit, vì vậy thang đo của các hệ số hồi quy hiện thời là log(LH), để đưa về thang đo nguyên thủy (mUI/mL) ta phải dùng hàm exponential.</p>
+<p>Mô hình thứ nhất cho biết giá trị trung bình của LH cho toàn quần thể <span class="math inline">\(\mu = exp(1.49042) = 4.438959\)</span></p>
+<p>Ta có thể đối chiếu với kết quả ước lượng từ dữ liệu thực nghiệm, và thấy rằng Intercept của mô hình m0 cơ bản rất phù hợp với giá trị trung bình của LH</p>
+<pre><code>## [1] 4.438955</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Tiếp theo, ta dựng một mô hình khác với 1 biến độc lập là phân nhóm Protocol. Mô hình này cho phép ước lượng giá trị trung bình LH ở 5 phân nhóm Protocol khác nhau, hay nói cách khác, khảo sát liên hệ giữa biến protocol và giá trị trung bình LH (hay hiệu ứng của Protocol đối với giá trị trung bình của LH).</li>
+</ol>
+<p><span class="math display">\[\mu_{LH} \sim \beta_0*Long + \beta_1*GnRHant + \beta_2*Short + \beta_3*Mild + \beta_4*PPOS\]</span></p>
+<p>Mô hình này có công thức cho tham số chính (trung bình của phân phối Gamma) là LH ~ Protocol; và cho tham số sigma: sigma.formula = ~ Protocol.</p>
+<p>Ở đây ta ước lượng đồng thời cả 2 tham số của phân phối Gamma là mu (trung bình) và sigma (tham số kiểu hình) theo biến Protocol. Vì ta không chỉ quan tâm đến việc Protocol sẽ làm thay đổi giá trị trung bình LH (trọng tâm của phân phối Gamma, tham số <span class="math inline">\(\mu\)</span>), mà còn muốn biết liệu phân loại Protocol có tác động gây thay đổi hình ảnh (độ phân tán, độ lệch) của phân phối Gamma (tham số <span class="math inline">\(\sigma\)</span>) hay không ?</p>
+<p>Nội dung của mô hình chính (ước lượng LH theo phác đồ) có nội dung như sau</p>
+<pre><code>## ******************************************************************
+## Family:  c(&quot;GA&quot;, &quot;Gamma&quot;) 
+## 
+## Call:  gamlss(formula = LH ~ Protocol, sigma.formula = ~Protocol,  
+##     family = GA, data = df, trace = F, parallel = &quot;multicore&quot;,      ncpus = nC) 
+## 
+## 
+## Fitting method: RS() 
+## 
+## ------------------------------------------------------------------
+## Mu link function:  log
+## Mu Coefficients:
+##                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        0.31235    0.05756   5.426 7.23e-08 ***
+## ProtocolGnRH_ant   1.73978    0.07409  23.481  &lt; 2e-16 ***
+## ProtocolLut_short  0.60523    0.06878   8.800  &lt; 2e-16 ***
+## ProtocolMild       2.17429    0.09639  22.556  &lt; 2e-16 ***
+## ProtocolPPOS       0.98292    0.08235  11.935  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ------------------------------------------------------------------
+## Sigma link function:  log
+## Sigma Coefficients:
+##                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       -0.07264    0.03903  -1.861 0.063003 .  
+## ProtocolGnRH_ant  -0.24182    0.05717  -4.230 2.56e-05 ***
+## ProtocolLut_short -0.51025    0.05988  -8.521  &lt; 2e-16 ***
+## ProtocolMild      -0.32842    0.08573  -3.831 0.000136 ***
+## ProtocolPPOS      -0.10027    0.05946  -1.686 0.092072 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ------------------------------------------------------------------
+## No. of observations in the fit:  1005 
+## Degrees of Freedom for the fit:  10
+##       Residual Deg. of Freedom:  995 
+##                       at cycle:  2 
+##  
+## Global Deviance:     4275.111 
+##             AIC:     4295.111 
+##             SBC:     4344.238 
+## ******************************************************************</code></pre>
+<p>Mô hình m1 này cho phép ước lượng giá trị trung bình của LH ở mỗi phân nhóm Protocol. Lưu ý rằng phác đồ Fol_long được chọn làm tham chiếu, vì vậy Intercept trong mô hình tương ứng với trung bình của log(LH) trong phân nhóm Protocol = Fol_long.</p>
+<p>Ta có thể đối chiếu với kết quả thống kê mô tả ban đầu:</p>
+<p>exp(Intercept) tương ứng với trung bình của LH trong phác đồ Follicular long acting, đơn vị mUI/mL: <span class="math inline">\(exp(0.31235) = 1.366633\)</span>, ta thấy giá trị này tương đồng với kết quả mean LH ở nhóm Fol_Long</p>
+<p>Giá trị trung bình LH nhóm GnRH_ant được tính bằng : exp(Intercept + ProtocolGnRH_ant): <span class="math inline">\(exp(0.31235 + 1.73978) = 7.784464\)</span>
+…</p>
+<p>Cứ thế, ta có thể ước lượng được trung bình của log(LH) hoặc LH ở cả 5 phân nhóm.</p>
+</div>
+<div id="suy-diễn-thống-kê-từ-mô-hình-glm-gamma" class="section level2 hasAnchor" number="2.9">
+<h2><span class="header-section-number">2.9</span> Suy diễn thống kê từ mô hình GLM-Gamma<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#suy-diễn-thống-kê-từ-mô-hình-glm-gamma" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Dựa vào 2 mô hình tuyến tính tổng quát này, ta có thể thực hiện một số suy diễn thống kê như sau:</p>
+<p>Đầu tiên, khi so sánh mô hình chỉ chứa intercept và mô hình có thêm biến Protocol bằng một kiểm định Likelihood ratio, ta có thể biết liệu phân nhóm phác đồ thực sự có hiệu ứng ý nghĩa đối với LH hay không ? (câu hỏi này tương tự với kiểm định F theo Fisher trong phân tích phương sai cổ điển)</p>
+<pre><code>##  Likelihood Ratio Test for nested GAMLSS models. 
+##  (No check whether the models are nested is performed). 
+##  
+##        Null model: deviance= 5005.425 with  2 deg. of freedom 
+##  Altenative model: deviance= 4275.111 with  10 deg. of freedom 
+##  
+##  LRT = 730.3143 with 8 deg. of freedom and p-value= 0</code></pre>
+<p>Kết quả cho ra một giá trị p cực kì thấp, như vậy ta có thể khẳng định rằng phân nhóm phác đồ thực sự có tác động làm thay đổi LH.</p>
+<p>Nói cách khác, có sự khác biệt ý nghĩa về giá trị LH giữa các nhóm phác đồ khác nhau. Tuy nhiên ta chưa thể biết rõ sự khác biệt này là ở nhóm nào so với nhóm nào.</p>
+<p>Nội dung hệ số hồi quy trong mô hình cho phép ta kiểm định về sự khác biệt của LH trung bình ở phác đồ PPOS, GnRH, Luteal short acting và Mild (Letrozole) so với nhóm tham chiếu là Follicular long acting.</p>
+<p>Dựa vào kết quả thô của mô hình, có thể thấy tất cả hệ số hồi quy đều &gt;0 và có ý nghĩa thống kê, cho thấy giá trị trung bình LH ở 4 phác đồ còn lại đều cao hơn so với phác đồ tham chiếu (Longacting).</p>
+<p>Tuy nhiên, ta sẽ không suy diễn trực tiếp dựa vào hệ số hồi quy, mà tiến hành một phân tích hậu kiểm với nội dung so sánh bắt cặp tuần tự giữa 5 loại phác đồ. Trong khi làm thống kê mô tả, ta có cảm nhận về khuynh hướng tăng dần của giá trị LH trung bình theo thứ tự: Fol_long &lt; Short &lt; PPOS &lt; GnRH_ant &lt; Mild</p>
+<p>Ở đây ta sẽ kiểm tra lại kết quả này. Để tiến hành phân tích hậu kiểm, ta dùng hàm avg_comparisons của thư viện marginalseffect với tùy chỉnh variables = list(Protocol = ‘pairwise’), sau đó hiệu chỉnh giá trị p bằng hàm p.adjust trong R, với phương pháp hiệu chỉnh Bonferroni.</p>
+<p>Kết quả của hàm này là một bảng như sau:</p>
+<p>Cột contrast trình bày các cặp so sánh mà ta cần kiểm nghiệm, thí dụ GnRH_ant - Fol_long;</p>
+<p>Cột estimate trình bày giá trị khác biệt trung bình về LH giữa 2 nhóm phác đồ, thí dụ GnRHant cao hơn Long acting 6.4178 mUI/mL.</p>
+<p>2 cột conf.low conf.high trình bày ngưỡng dưới và trên khoảng tin cậy 95% của khác biệt, KTC95% có ý nghĩa thống kê khi không chứa giá trị 0.</p>
+<p>Cột adj_p trình bày giá trị p sau hiệu chỉnh Bonferroni,</p>
+<p>Kết quả cho thấy toàn bộ 10 giả thuyết đều có ý nghĩa thống kê. Một cách tổng quát, giá trị LH trung bình tăng dần theo thứ tự 5 phác đồ:</p>
+<p>Fol_long &lt; Short &lt; PPOS &lt; GnRH_ant &lt; Mild</p>
+<p>Như vậy phác đồ Mild stimulation với Letrozole có LH trung bình ngày trigger cao nhất, phác đồ Follicular long acting có LH trung bình thấp nhất, phác đồ PPOS ở vị trí trung gian, với LH cao hơn so với 2 phác đồ Long và Short.</p>
+<p>Cuối cùng, kết quả của mô hình hồi quy có thể trình bày trực quan như sau:</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+Chú thích: Trên nền phân phối của dữ liệu thực tế (biểu đồ mật độ và các điểm dữ liệu), ta trình bày kết quả LH trung bình cho mỗi phân nhóm theo mô hình (chấm tròn màu đen là giá trị trung bình ước lượng, error bar tương ứng với KTC95% của giá trị này).</p>
+</div>
+<div id="kết-luận-1" class="section level2 hasAnchor" number="2.10">
+<h2><span class="header-section-number">2.10</span> Kết luận<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#kết-luận-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Qua thí nghiệm này, ta có thể nhận ra rằng mô hình GLM với phân phối Gamma là một giải pháp phổ quát và thích hợp cho mọi tình huống so sánh biến định lượng giữa nhiều phân nhóm trong nghiên cứu y học lâm sàng.</p>
+</div>
+<div id="thông-điệp-rút-gọn-làm-hành-trang" class="section level2 hasAnchor" number="2.11">
+<h2><span class="header-section-number">2.11</span> Thông điệp rút gọn làm hành trang<a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#thông-điệp-rút-gọn-làm-hành-trang" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li><p>Các đại lượng y sinh học thường có giá trị dương và có phân phối lệch, nên quy luật phân phối Gamma sẽ phù hợp hơn so với phân phối Gaussian.</p></li>
+<li><p>Mô hình GLM hiệu quả hơn nhiều và có thể thay thế hoàn toàn các công cụ cổ điển như kiểm định t, phân tích phương sai (ANOVA) và cả mô hình hồi quy tuyến tính thông thường.</p></li>
+</ol>
+
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-broom" class="csl-entry">
+al., David Robinson et. 2023. <em>Broom: Convert Statistical Objects into Tidy Tibbles</em>. <a href="https://cran.r-project.org/package=broom">https://cran.r-project.org/package=broom</a>.
+</div>
+<div id="ref-fitdistrplus" class="csl-entry">
+Delignette-Muller, Marie Laure, and Christophe Dutang. 2015. <span>“<span class="nocase">fitdistrplus</span>: An <span>R</span> Package for Fitting Distributions.”</span> <em>Journal of Statistical Software</em> 64 (4): 1–34. <a href="https://doi.org/10.18637/jss.v064.i04">https://doi.org/10.18637/jss.v064.i04</a>.
+</div>
+<div id="ref-nelder1972" class="csl-entry">
+Nelder, John, and Robert Wedderburn. 1972. <span>“Generalized Linear Models.”</span> <em>Journal of the Royal Statistical Society</em> 135.3: 370–84.
+</div>
+<div id="ref-gamlss1" class="csl-entry">
+Rigby, R. A., and D. M. Stasinopoulos. 2005. <span>“Generalized Additive Models for Location, Scale and Shape.”</span> <em>Applied Statistics</em> 54.3: 507–54.
+</div>
+<div id="ref-rigby2020" class="csl-entry">
+Rigby, Robert A. 2020. <em>Distributions for Modeling Location, Scale, and Shape Using GAMLSS in r</em>. 1st ed. <a href="https://www.routledge.com/Distributions-for-Modeling-Location-Scale-and-Shape-Using-GAMLSS-in-R/Rigby-Stasinopoulos-Heller-Bastiani/p/book/9781032089423">https://www.routledge.com/Distributions-for-Modeling-Location-Scale-and-Shape-Using-GAMLSS-in-R/Rigby-Stasinopoulos-Heller-Bastiani/p/book/9781032089423</a>.
+</div>
+<div id="ref-stasinopoulos2017" class="csl-entry">
+Stasinopoulos, Mikis D. 2017. <em>Flexible Regression and Smoothing Using GAMLSS in r</em>. 1st ed. <a href="https://www.routledge.com/Flexible-Regression-and-Smoothing-Using-GAMLSS-in-R/Stasinopoulos-Rigby-Heller-Voudouris-Bastiani/p/book/9781138197909">https://www.routledge.com/Flexible-Regression-and-Smoothing-Using-GAMLSS-in-R/Stasinopoulos-Rigby-Heller-Voudouris-Bastiani/p/book/9781138197909</a>.
+</div>
+<div id="ref-marginal" class="csl-entry">
+Vincent Arel-Bundock, Marcio Augusto Diniz et al. 2023. <em>Marginaleffects: Predictions, Comparisons, Slopes, Marginal Means, and Hypothesis Tests</em>. <a href="https://cran.r-project.org/web/packages/marginaleffects/index.html">https://cran.r-project.org/web/packages/marginaleffects/index.html</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. <span>“Welcome to the <span class="nocase">tidyverse</span>.”</span> <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-ggridges" class="csl-entry">
+Wilke, Claus O. 2022. <em><span class="nocase">ggridges</span>: Ridgeline Plots in ’Ggplot2</em>. <a href="https://CRAN.R-project.org/package=ggridges">https://CRAN.R-project.org/package=ggridges</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/kinokoberuji/OGStats/edit/master/01-Gamma.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["statistics-ivf-research.pdf", "statistics-ivf-research.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

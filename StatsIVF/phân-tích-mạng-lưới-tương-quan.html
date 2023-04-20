@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chương 5 Phân tích mạng lưới tương quan | Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R</title>
+  <meta name="description" content="Giáo trình thống kê chuyên dụng cho nghiên cứu hỗ trợ sinh sản" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chương 5 Phân tích mạng lưới tương quan | Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Giáo trình thống kê chuyên dụng cho nghiên cứu hỗ trợ sinh sản" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chương 5 Phân tích mạng lưới tương quan | Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R" />
+  
+  <meta name="twitter:description" content="Giáo trình thống kê chuyên dụng cho nghiên cứu hỗ trợ sinh sản" />
+  
+
+<meta name="author" content="Lê Ngọc Khả Nhi và cộng sự" />
+
+
+<meta name="date" content="2023-04-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"/>
+<link rel="next" href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Thống kê chuyên dụng nghiên cứu IVF</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Lời giới thiệu</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#giới-thiệu-về-nghiên-cứu-hỗ-trợ-sinh-sản"><i class="fa fa-check"></i><b>1.1</b> Giới thiệu về nghiên cứu hỗ trợ sinh sản</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#đặt-vấn-đề"><i class="fa fa-check"></i><b>1.1.1</b> Đặt vấn đề</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#lịch-sử-nghiên-cứu-về-ivf"><i class="fa fa-check"></i><b>1.1.2</b> Lịch sử nghiên cứu về IVF</a></li>
+<li class="chapter" data-level="1.1.3" data-path="index.html"><a href="index.html#xu-hướng-nghiên-cứu-ivf"><i class="fa fa-check"></i><b>1.1.3</b> Xu hướng nghiên cứu IVF</a></li>
+<li class="chapter" data-level="1.1.4" data-path="index.html"><a href="index.html#so-sánh-kết-quả-ivf-trước-và-sau-khi-có-nghiên-cứu"><i class="fa fa-check"></i><b>1.1.4</b> So sánh kết quả IVF trước và sau khi có nghiên cứu</a></li>
+<li class="chapter" data-level="1.1.5" data-path="index.html"><a href="index.html#kết-luận"><i class="fa fa-check"></i><b>1.1.5</b> Kết luận</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#giới-thiệu-về-giáo-trình"><i class="fa fa-check"></i><b>1.2</b> Giới thiệu về giáo trình</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#ý-tưởng-về-một-giáo-trình-thống-kê-chuyên-dụng-cho-nghiên-cứu-htss"><i class="fa fa-check"></i><b>1.2.1</b> Ý tưởng về một giáo trình thống kê chuyên dụng cho nghiên cứu HTSS</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#mục-tiêu-học-tập"><i class="fa fa-check"></i><b>1.2.2</b> Mục tiêu học tập</a></li>
+<li class="chapter" data-level="1.2.3" data-path="index.html"><a href="index.html#nội-dung-và-quy-ước-trình-bày"><i class="fa fa-check"></i><b>1.2.3</b> Nội dung và quy ước trình bày</a></li>
+<li class="chapter" data-level="1.2.4" data-path="index.html"><a href="index.html#nguồn-gốc-của-dữ-liệu"><i class="fa fa-check"></i><b>1.2.4</b> Nguồn gốc của dữ liệu</a></li>
+<li class="chapter" data-level="1.2.5" data-path="index.html"><a href="index.html#về-một-số-thư-viện-r-quan-trọng"><i class="fa fa-check"></i><b>1.2.5</b> Về một số thư viện R quan trọng</a></li>
+<li class="chapter" data-level="1.2.6" data-path="index.html"><a href="index.html#yêu-cầu-về-kiến-thức-và-kỹ-năng-cơ-bản"><i class="fa fa-check"></i><b>1.2.6</b> Yêu cầu về kiến thức và kỹ năng cơ bản</a></li>
+<li class="chapter" data-level="1.2.7" data-path="index.html"><a href="index.html#khả-năng-tương-thích-với-chuyên-khoa-lâm-sàng-khác"><i class="fa fa-check"></i><b>1.2.7</b> Khả năng tương thích với chuyên khoa lâm sàng khác</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><i class="fa fa-check"></i><b>2</b> Khảo sát biến số liên tục: Mô hình hồi quy Gamma</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#giới-thiệu"><i class="fa fa-check"></i><b>2.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="2.2" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#bối-cảnh-của-thí-nghiệm"><i class="fa fa-check"></i><b>2.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="2.3" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#công-cụ-cần-thiết"><i class="fa fa-check"></i><b>2.3</b> Công cụ cần thiết</a></li>
+<li class="chapter" data-level="2.4" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#chuẩn-bị-dữ-liệu"><i class="fa fa-check"></i><b>2.4</b> Chuẩn bị dữ liệu</a></li>
+<li class="chapter" data-level="2.5" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#kế-hoạch-phân-tích"><i class="fa fa-check"></i><b>2.5</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="2.6" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#phân-tích-mô-tả"><i class="fa fa-check"></i><b>2.6</b> Phân tích mô tả</a></li>
+<li class="chapter" data-level="2.7" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#biện-luận-về-tính-phù-hợp-của-phân-phối-gamma"><i class="fa fa-check"></i><b>2.7</b> Biện luận về tính phù hợp của phân phối Gamma</a></li>
+<li class="chapter" data-level="2.8" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#dựng-mô-hình-hồi-quy-với-phân-phối-gamma"><i class="fa fa-check"></i><b>2.8</b> Dựng mô hình hồi quy với phân phối Gamma</a></li>
+<li class="chapter" data-level="2.9" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#suy-diễn-thống-kê-từ-mô-hình-glm-gamma"><i class="fa fa-check"></i><b>2.9</b> Suy diễn thống kê từ mô hình GLM-Gamma</a></li>
+<li class="chapter" data-level="2.10" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#kết-luận-1"><i class="fa fa-check"></i><b>2.10</b> Kết luận</a></li>
+<li class="chapter" data-level="2.11" data-path="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html"><a href="khảo-sát-biến-số-liên-tục-mô-hình-hồi-quy-gamma.html#thông-điệp-rút-gọn-làm-hành-trang"><i class="fa fa-check"></i><b>2.11</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><i class="fa fa-check"></i><b>3</b> Mô tả dữ liệu đa biến: Phân tích nhân tố chính (PCA)</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#giới-thiệu-1"><i class="fa fa-check"></i><b>3.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="3.2" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#bối-cảnh-của-thí-nghiệm-1"><i class="fa fa-check"></i><b>3.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="3.3" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#công-cụ-cần-thiết-1"><i class="fa fa-check"></i><b>3.3</b> Công cụ cần thiết</a></li>
+<li class="chapter" data-level="3.4" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#xác-định-số-thành-phần-chính-tối-ưu"><i class="fa fa-check"></i><b>3.4</b> Xác định số thành phần chính tối ưu</a></li>
+<li class="chapter" data-level="3.5" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#phân-tích-pca"><i class="fa fa-check"></i><b>3.5</b> Phân tích PCA</a></li>
+<li class="chapter" data-level="3.6" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#trình-bày-kết-quả-pca-bằng-biểu-đồ-biplot"><i class="fa fa-check"></i><b>3.6</b> Trình bày kết quả PCA bằng biểu đồ Biplot</a></li>
+<li class="chapter" data-level="3.7" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#phân-tích-vai-trò-của-mỗi-biến-trong-2-thành-phần-chính"><i class="fa fa-check"></i><b>3.7</b> Phân tích vai trò của mỗi biến trong 2 thành phần chính</a></li>
+<li class="chapter" data-level="3.8" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#khảo-sát-đặc-tính-phân-phối-của-mỗi-thành-phần-chính"><i class="fa fa-check"></i><b>3.8</b> Khảo sát đặc tính phân phối của mỗi thành phần chính</a></li>
+<li class="chapter" data-level="3.9" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#kết-luận-2"><i class="fa fa-check"></i><b>3.9</b> Kết luận</a></li>
+<li class="chapter" data-level="3.10" data-path="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html"><a href="mô-tả-dữ-liệu-đa-biến-phân-tích-nhân-tố-chính-pca.html#thông-điệp-rút-gọn-làm-hành-trang-1"><i class="fa fa-check"></i><b>3.10</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><i class="fa fa-check"></i><b>4</b> Khảo sát kết cục số đếm: Hồi quy Negative Binomial</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#giới-thiệu-2"><i class="fa fa-check"></i><b>4.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="4.2" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#bối-cảnh-của-thí-nghiệm-2"><i class="fa fa-check"></i><b>4.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="4.3" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#kế-hoạch-phân-tích-1"><i class="fa fa-check"></i><b>4.3</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="4.4" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#công-cụ-cần-thiết-2"><i class="fa fa-check"></i><b>4.4</b> Công cụ cần thiết</a></li>
+<li class="chapter" data-level="4.5" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#thống-kê-mô-tả"><i class="fa fa-check"></i><b>4.5</b> Thống kê mô tả</a></li>
+<li class="chapter" data-level="4.6" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#biện-luận-về-tính-phù-hợp-của-quy-luật-phân-phối-nbi"><i class="fa fa-check"></i><b>4.6</b> Biện luận về tính phù hợp của quy luật phân phối NBI</a></li>
+<li class="chapter" data-level="4.7" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#phân-tích-hồi-quy-bằng-mô-hình-glm-nbi"><i class="fa fa-check"></i><b>4.7</b> Phân tích hồi quy bằng mô hình GLM NBI</a></li>
+<li class="chapter" data-level="4.8" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#diễn-đạt-kết-quả-phân-tích"><i class="fa fa-check"></i><b>4.8</b> Diễn đạt kết quả phân tích</a></li>
+<li class="chapter" data-level="4.9" data-path="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html"><a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html#thông-điệp-rút-gọn-làm-hành-trang-2"><i class="fa fa-check"></i><b>4.9</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html"><i class="fa fa-check"></i><b>5</b> Phân tích mạng lưới tương quan</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#giới-thiệu-3"><i class="fa fa-check"></i><b>5.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="5.2" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#bối-cảnh-thí-nghiệm"><i class="fa fa-check"></i><b>5.2</b> Bối cảnh thí nghiệm</a></li>
+<li class="chapter" data-level="5.3" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#thăm-dò-dữ-liệu"><i class="fa fa-check"></i><b>5.3</b> Thăm dò dữ liệu</a></li>
+<li class="chapter" data-level="5.4" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#ma-trận-tương-quan"><i class="fa fa-check"></i><b>5.4</b> Ma trận tương quan</a></li>
+<li class="chapter" data-level="5.5" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#sơ-đồ-mạng-lưới-tương-quan"><i class="fa fa-check"></i><b>5.5</b> Sơ đồ mạng lưới tương quan</a></li>
+<li class="chapter" data-level="5.6" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#phân-tích-cấu-trúc-mạng-lưới-tương-quan"><i class="fa fa-check"></i><b>5.6</b> Phân tích cấu trúc mạng lưới tương quan</a></li>
+<li class="chapter" data-level="5.7" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#yếu-tố-mỹ-thuật"><i class="fa fa-check"></i><b>5.7</b> Yếu tố mỹ thuật</a></li>
+<li class="chapter" data-level="5.8" data-path="phân-tích-mạng-lưới-tương-quan.html"><a href="phân-tích-mạng-lưới-tương-quan.html#thông-điệp-rút-gọn-làm-hành-trang-3"><i class="fa fa-check"></i><b>5.8</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><i class="fa fa-check"></i><b>6</b> Khảo sát kết cục là tỷ lệ: Hồi quy Binomial</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#giới-thiệu-4"><i class="fa fa-check"></i><b>6.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="6.2" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#bối-cảnh-của-thí-nghiệm-3"><i class="fa fa-check"></i><b>6.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="6.3" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#công-cụ-cần-thiết-cho-quy-trình"><i class="fa fa-check"></i><b>6.3</b> Công cụ cần thiết cho quy trình</a></li>
+<li class="chapter" data-level="6.4" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#chuẩn-bị-dữ-liệu-1"><i class="fa fa-check"></i><b>6.4</b> Chuẩn bị dữ liệu</a></li>
+<li class="chapter" data-level="6.5" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#kế-hoạch-phân-tích-2"><i class="fa fa-check"></i><b>6.5</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="6.6" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#thống-kê-mô-tả-1"><i class="fa fa-check"></i><b>6.6</b> Thống kê mô tả</a></li>
+<li class="chapter" data-level="6.7" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#dựng-mô-hình-hồi-quy-glm-binomial"><i class="fa fa-check"></i><b>6.7</b> Dựng mô hình hồi quy GLM Binomial</a></li>
+<li class="chapter" data-level="6.8" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#suy-diễn-thống-kê"><i class="fa fa-check"></i><b>6.8</b> Suy diễn thống kê</a></li>
+<li class="chapter" data-level="6.9" data-path="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html"><a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html#thông-điệp-rút-gọn-làm-hành-trang-4"><i class="fa fa-check"></i><b>6.9</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><i class="fa fa-check"></i><b>7</b> Thí nghiệm khảo sát lặp lại: Mô hình GEE</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#giới-thiệu-5"><i class="fa fa-check"></i><b>7.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="7.2" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#bối-cảnh-của-thí-nghiệm-4"><i class="fa fa-check"></i><b>7.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="7.3" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#công-cụ-cho-quy-trình"><i class="fa fa-check"></i><b>7.3</b> Công cụ cho quy trình</a></li>
+<li class="chapter" data-level="7.4" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#thống-kê-mô-tả-2"><i class="fa fa-check"></i><b>7.4</b> Thống kê mô tả</a></li>
+<li class="chapter" data-level="7.5" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#phân-tích-bài-toán"><i class="fa fa-check"></i><b>7.5</b> Phân tích bài toán</a></li>
+<li class="chapter" data-level="7.6" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#giới-thiệu-về-mô-hình-gee"><i class="fa fa-check"></i><b>7.6</b> Giới thiệu về mô hình GEE</a></li>
+<li class="chapter" data-level="7.7" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#dựng-mô-hình-gee"><i class="fa fa-check"></i><b>7.7</b> Dựng mô hình GEE</a></li>
+<li class="chapter" data-level="7.8" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#diễn-giải-kết-quả-mô-hình-gee"><i class="fa fa-check"></i><b>7.8</b> Diễn giải kết quả mô hình GEE</a></li>
+<li class="chapter" data-level="7.9" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#diễn-đạt-kết-quả-của-phân-tích"><i class="fa fa-check"></i><b>7.9</b> Diễn đạt kết quả của phân tích:</a></li>
+<li class="chapter" data-level="7.10" data-path="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html"><a href="thí-nghiệm-khảo-sát-lặp-lại-mô-hình-gee.html#thông-điệp-rút-gọn-làm-hành-trang-5"><i class="fa fa-check"></i><b>7.10</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><i class="fa fa-check"></i><b>8</b> Khảo sát kết cục nhị phân: Hồi quy logistic</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#giới-thiệu-6"><i class="fa fa-check"></i><b>8.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="8.2" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#bối-cảnh-của-thí-nghiệm-5"><i class="fa fa-check"></i><b>8.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="8.3" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#kế-hoạch-phân-tích-3"><i class="fa fa-check"></i><b>8.3</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="8.4" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#công-cụ-cần-thiết-cho-quy-trình-1"><i class="fa fa-check"></i><b>8.4</b> Công cụ cần thiết cho quy trình</a></li>
+<li class="chapter" data-level="8.5" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#chuẩn-bị-dữ-liệu-2"><i class="fa fa-check"></i><b>8.5</b> Chuẩn bị dữ liệu</a></li>
+<li class="chapter" data-level="8.6" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#phân-tích-mô-tả-1"><i class="fa fa-check"></i><b>8.6</b> Phân tích mô tả</a></li>
+<li class="chapter" data-level="8.7" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#lý-thuyết-về-mô-hình-hồi-quy-logistic"><i class="fa fa-check"></i><b>8.7</b> Lý thuyết về mô hình hồi quy logistic</a></li>
+<li class="chapter" data-level="8.8" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#mô-hình-hồi-quy-logistic-cho-biến-kết-quả-nhị-giá"><i class="fa fa-check"></i><b>8.8</b> Mô hình hồi quy Logistic cho biến kết quả nhị giá</a></li>
+<li class="chapter" data-level="8.9" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#mô-hình-hồi-quy-binomial-cho-tỷ-lệ-optổng-số-phôi"><i class="fa fa-check"></i><b>8.9</b> Mô hình hồi quy Binomial cho tỷ lệ OP/tổng số phôi</a></li>
+<li class="chapter" data-level="8.10" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#diễn-giải-kết-quả-của-phân-tích"><i class="fa fa-check"></i><b>8.10</b> Diễn giải kết quả của phân tích</a></li>
+<li class="chapter" data-level="8.11" data-path="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html"><a href="khảo-sát-kết-cục-nhị-phân-hồi-quy-logistic.html#thông-điệp-rút-gọn-làm-hành-trang-6"><i class="fa fa-check"></i><b>8.11</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><i class="fa fa-check"></i><b>9</b> Ứng dụng sơ đồ mạng định hướng không tuần hoàn (DAG)</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#đặt-vấn-đề-1"><i class="fa fa-check"></i><b>9.1</b> Đặt vấn đề</a></li>
+<li class="chapter" data-level="9.2" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#bối-cảnh-của-thí-nghiệm-6"><i class="fa fa-check"></i><b>9.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="9.3" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#kế-hoạch-phân-tích-4"><i class="fa fa-check"></i><b>9.3</b> Kế hoạch phân tích</a></li>
+<li class="chapter" data-level="9.4" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#mô-tả-đơn-giản"><i class="fa fa-check"></i><b>9.4</b> Mô tả đơn giản</a></li>
+<li class="chapter" data-level="9.5" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#sơ-đồ-nhân-quả-và-mô-hình-dag"><i class="fa fa-check"></i><b>9.5</b> Sơ đồ nhân quả và mô hình DAG</a></li>
+<li class="chapter" data-level="9.6" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#xác-định-tập-hợp-biến-cần-hiệu-chỉnh"><i class="fa fa-check"></i><b>9.6</b> Xác định tập hợp biến cần hiệu chỉnh</a></li>
+<li class="chapter" data-level="9.7" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#ước-lượng-bằng-mô-hình-hồi-quy-logistic"><i class="fa fa-check"></i><b>9.7</b> Ước lượng bằng mô hình hồi quy logistic</a></li>
+<li class="chapter" data-level="9.8" data-path="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html"><a href="ứng-dụng-sơ-đồ-mạng-định-hướng-không-tuần-hoàn-dag.html#thông-điệp-rút-gọn-làm-hành-trang-7"><i class="fa fa-check"></i><b>9.8</b> Thông điệp rút gọn làm hành trang:</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html"><i class="fa fa-check"></i><b>10</b> Mô hình Machine learning khả diễn</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#giới-thiệu-7"><i class="fa fa-check"></i><b>10.1</b> Giới thiệu</a></li>
+<li class="chapter" data-level="10.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#bối-cảnh-của-thí-nghiệm-7"><i class="fa fa-check"></i><b>10.2</b> Bối cảnh của thí nghiệm</a></li>
+<li class="chapter" data-level="10.3" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#kế-hoạch-phân-tích-5"><i class="fa fa-check"></i><b>10.3</b> Kế hoạch phân tích:</a></li>
+<li class="chapter" data-level="10.4" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#chuẩn-bị-và-thăm-dò-dữ-liệu"><i class="fa fa-check"></i><b>10.4</b> Chuẩn bị và thăm dò dữ liệu</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#các-thông-số-định-tính-rời-rạc"><i class="fa fa-check"></i><b>10.4.1</b> Các thông số định tính, rời rạc</a></li>
+<li class="chapter" data-level="10.4.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#các-biến-số-liên-tục"><i class="fa fa-check"></i><b>10.4.2</b> Các biến số liên tục</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#phân-chia-dữ-liệu"><i class="fa fa-check"></i><b>10.5</b> Phân chia dữ liệu</a></li>
+<li class="chapter" data-level="10.6" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#thiết-lập-mô-hình-phân-loại"><i class="fa fa-check"></i><b>10.6</b> Thiết lập mô hình phân loại</a>
+<ul>
+<li class="chapter" data-level="10.6.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#bước-3a-công-đoạn-sơ-chế-dữ-liệu"><i class="fa fa-check"></i><b>10.6.1</b> Bước 3a) Công đoạn sơ chế dữ liệu</a></li>
+<li class="chapter" data-level="10.6.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#khởi-tạo-mô-hình-xgboost"><i class="fa fa-check"></i><b>10.6.2</b> Khởi tạo mô hình XGBoost</a></li>
+<li class="chapter" data-level="10.6.3" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#tạo-workflow"><i class="fa fa-check"></i><b>10.6.3</b> Tạo workflow</a></li>
+<li class="chapter" data-level="10.6.4" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#thực-hiện-kiểm-định-chéo-lặp-lại-10x10"><i class="fa fa-check"></i><b>10.6.4</b> Thực hiện kiểm định chéo lặp lại 10x10</a></li>
+</ul></li>
+<li class="chapter" data-level="10.7" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#các-tiêu-chí-hiệu-năng-mô-hình-phân-loại-nhị-phân"><i class="fa fa-check"></i><b>10.7</b> Các tiêu chí hiệu năng mô hình phân loại nhị phân</a></li>
+<li class="chapter" data-level="10.8" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#huấn-luyện-mô-hình-trên-toàn-thể-dữ-liệu-tập-train"><i class="fa fa-check"></i><b>10.8</b> Huấn luyện mô hình trên toàn thể dữ liệu tập Train</a></li>
+<li class="chapter" data-level="10.9" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#kiểm-định-độc-lập-hiệu-năng-mô-hình"><i class="fa fa-check"></i><b>10.9</b> Kiểm định độc lập hiệu năng mô hình</a></li>
+<li class="chapter" data-level="10.10" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#phân-tích-hậu-kiểm-bằng-kỹ-thuật-shap"><i class="fa fa-check"></i><b>10.10</b> Phân tích hậu kiểm bằng kỹ thuật SHAP</a>
+<ul>
+<li class="chapter" data-level="10.10.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#giới-thiệu-về-phương-pháp-diễn-giải-mô-hình-shap"><i class="fa fa-check"></i><b>10.10.1</b> Giới thiệu về phương pháp diễn giải mô hình SHAP</a></li>
+</ul></li>
+<li class="chapter" data-level="10.11" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#vai-trò-của-các-thông-số-đóng-góp-vào-kết-quả-tiên-lượng"><i class="fa fa-check"></i><b>10.11</b> Vai trò của các thông số đóng góp vào kết quả tiên lượng</a>
+<ul>
+<li class="chapter" data-level="10.11.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#shap-score-có-thể-dùng-để-phân-cụm-dữ-liệu"><i class="fa fa-check"></i><b>10.11.1</b> SHAP score có thể dùng để phân cụm dữ liệu</a></li>
+</ul></li>
+<li class="chapter" data-level="10.12" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#bàn-luận"><i class="fa fa-check"></i><b>10.12</b> Bàn luận:</a>
+<ul>
+<li class="chapter" data-level="10.12.1" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#ưu-điểm-và-nhược-điểm-của-mô-hình-xgboost"><i class="fa fa-check"></i><b>10.12.1</b> Ưu điểm và nhược điểm của mô hình XGboost</a></li>
+<li class="chapter" data-level="10.12.2" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#ưu-điểm-và-nhược-điểm-của-kỹ-thuật-shap"><i class="fa fa-check"></i><b>10.12.2</b> Ưu điểm và nhược điểm của kỹ thuật SHAP</a></li>
+<li class="chapter" data-level="10.12.3" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#diễn-giải-cơ-chế-hoạt-động-của-mô-hình-ở-cấp-độ-cá-thể"><i class="fa fa-check"></i><b>10.12.3</b> Diễn giải cơ chế hoạt động của mô hình ở cấp độ cá thể:</a></li>
+</ul></li>
+<li class="chapter" data-level="10.13" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#kết-luận-3"><i class="fa fa-check"></i><b>10.13</b> Kết luận</a></li>
+<li class="chapter" data-level="10.14" data-path="mô-hình-machine-learning-khả-diễn.html"><a href="mô-hình-machine-learning-khả-diễn.html#thông-điệp-rút-gọn-làm-hành-trang-8"><i class="fa fa-check"></i><b>10.14</b> Thông điệp rút gọn làm hành trang</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/kinokoberuji/OGStats" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Phân tích dữ liệu cho nghiên cứu hỗ trợ sinh sản bằng ngôn ngữ R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="phân-tích-mạng-lưới-tương-quan" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chương 5</span> Phân tích mạng lưới tương quan<a href="phân-tích-mạng-lưới-tương-quan.html#phân-tích-mạng-lưới-tương-quan" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><strong>Biên soạn:</strong> Lê Ngọc Khả Nhi</p>
+<div id="giới-thiệu-3" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Giới thiệu<a href="phân-tích-mạng-lưới-tương-quan.html#giới-thiệu-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Đây là sự tiếp nối câu chuyện về phân tích dữ liệu đa chiều mà ta đã đề cập trong chương 2. Trong chương này ta sẽ khảo sát mối liên hệ giữa các thông số định lượng - đây cũng là một bài toán thống kê thường gặp trong nghiên cứu y học với tên gọi “phân tích tương quan” (correlation analysis).</p>
+<p>Phân tích tương quan có giá trị ứng dụng trong nhiều hoàn cảnh, bao gồm mô tả về mối liên hệ giữa các yếu tố trong thực thể bệnh lý, nhận diện các quy luật sinh lý-bệnh học, phát hiện những thông số xét nghiệm tiềm năng cho mục tiêu chẩn đoán hoặc tiên lượng, xác định những biến số quan trọng để xây dựng mô hình hồi quy với mục tiêu tiên lượng hoặc diễn dịch, vv.</p>
+<p>Thông thường, phân tích tương quan có ý nghĩa tuyến tính và được áp dụng cho một cặp biến số. Các bạn đồng nghiệp thường sử dụng hệ số tương quan <span class="math inline">\(r\)</span> của Pearson (thuật ngữ đầy đủ: Pearson’s product moment correlation coefficient). Đây là một trị số thống kê cho phép đo lường độ mạnh và chiều hướng của tương quan tuyến tính giữa 2 biến liên tục <span class="math inline">\(X\)</span> và <span class="math inline">\(Y\)</span>. Một cách tổng quát, <span class="math inline">\(r\)</span> được xác định bằng tỷ số giữa hiệp phương sai (covariance) của 2 biến <span class="math inline">\(X,Y\)</span> chia cho tích số của độ lệch chuẩn của chúng:</p>
+<p><span class="math display">\[r_{X,Y}=\frac{Cov(XY)}{\sigma_X*\sigma_Y}\]</span>
+Ta cũng có thể hình dung về <span class="math inline">\(r\)</span> như hệ số hồi quy trong một mô hình hồi quy tuyến tính đơn biến <span class="math inline">\(Y \sim X\)</span> khi cả X và Y đều cùng đơn vị đo trên một thang đo chuẩn hóa (z-scores).</p>
+<p>Giá trị của <span class="math inline">\(r\)</span> dao động trong khoảng -1 đến +1 và có thể cho biết chiều hướng của mối tương quan: <span class="math inline">\(r=0\)</span> trong trường hợp không có liên hệ nào giữa 2 biến, <span class="math inline">\(r&gt;0\)</span> biểu thị cho mối tương quan thuận (X và Y biến thiên cùng hướng), <span class="math inline">\(r&lt;0\)</span> biểu thị cho tương quan nghịch (X tăng, Y giảm và ngược lại). Giá trị tuyệt đối của <span class="math inline">\(r\)</span> cho biến độ mạnh của tương quan: càng gần cực trị +/-1 thì mức độ tương quan càng mạnh. Giá trị <span class="math inline">\(r\)</span> càng gần 1 cho thấy 2 biến tỉ lệ với nhau một cách hoàn hảo.</p>
+<p>Ý nghĩa thống kê của hệ số tương quan <span class="math inline">\(r\)</span> được kiểm định thông qua một suy diễn thống kê nhằm phản nghiệm giả thuyết H0 là r=0 (không có tương quan), dựa vào trị số thống kê <span class="math inline">\(t\)</span> được ước tính từ r và cỡ mẫu, t theo phân phối Student t với độ tự do = (n-2):</p>
+<p><span class="math display">\[t = r\sqrt{\frac{N-2}{1-r^2}}\]</span>
+Mặt khác, với sự phát triển của kiến thức sinh lý bệnh học và công nghệ xét nghiệm, nhà khoa học được cung cấp lượng thông tin ngày càng nhiều và sâu hơn, thậm chí đến cấp độ phân tử. Lúc này, việc đọc và diễn giải kết quả phân tích tương quan trở nên khó khăn khi kết quả thu được sẽ là một bảng với kích thước rất lớn, trình bày giá trị hệ số tương quan của mỗi biến bắt cặp tuần tự với tất cả những biến còn lại. Vì vậy, chúng ta cần một giải pháp khác hiệu quả hơn thay cho bảng kết quả.</p>
+<p>Trong chương này chúng ta sẽ tìm hiểu về quy trình phân tích mạng lưới tương quan (correlation network), một ý tưởng thú vị cho phép trình bày bức tranh toàn cảnh về cấu trúc liên hệ phức tạp giữa rất nhiều biến số trong một thực thể bệnh lý.</p>
+</div>
+<div id="bối-cảnh-thí-nghiệm" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Bối cảnh thí nghiệm<a href="phân-tích-mạng-lưới-tương-quan.html#bối-cảnh-thí-nghiệm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Ta sẽ phân tích một dữ liệu có thực với mục tiêu đặt ra là khảo sát về mối tương quan giữa 15 thông số lâm sàng trong 2 nhóm khác nhau: 132 phụ nữ bình thường và 249 trường hợp có hội chứng buồng trứng đa nang (PCOS) có kèm rối loạn kháng insulin (IR).</p>
+<p>Tập hợp 15 thông số cần phân tích bao gồm: tuổi của bệnh nhân (Age), chỉ số BMI, kết quả định lượng các loại hormones: AMH: (Anti-Müllerian Hormone), E2 (Estrogen), FSH (Follicle-Stimulating Hormone), LH (Luteinizing hormone), P (Progesterone hormone), PRL (prolactin hormone), T (Testosterone hormone), TSH (thyroid stimulating hormone), các chỉ số: AFC (antral follicle count), OSI (ovarian sensitivity index), kết quả insulin fasting blood test (F_INS), đường huyết (Gluc) và HOMA-IR (Homeostatic Model Assessment for Insulin Resistance).</p>
+</div>
+<div id="thăm-dò-dữ-liệu" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Thăm dò dữ liệu<a href="phân-tích-mạng-lưới-tương-quan.html#thăm-dò-dữ-liệu" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Trước hết, ta tải dữ liệu vào R và thực hiện một phân tích thống kê mô tả đơn giản về đặc điểm phân phối của 15 biến số kể trên giữa 2 nhóm Normal và PCOS. Kết quả trình bày trong bảng sau:</p>
+</div>
+<div id="ma-trận-tương-quan" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> Ma trận tương quan<a href="phân-tích-mạng-lưới-tương-quan.html#ma-trận-tương-quan" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Tiếp theo, ta sẽ thực hiện một phân tích tương quan cổ điển cho 15 biến số này, riêng cho mỗi nhóm Normal và PCOS, sử dụng hệ số tương quan <span class="math inline">\(r\)</span> của Pearson theo quy trình gồm 3 bước sau:</p>
+<ol style="list-style-type: decimal">
+<li><p>Dùng hàm filter của dplyr để phân lập 2 dataframe riêng cho 2 nhóm Normal và PCOS,</p></li>
+<li><p>Dùng hàm select để loại bỏ biến phân nhóm cho mỗi dataframe, kết quả ta sẽ có một matrix chỉ chứa toàn biến kiểu số</p></li>
+<li><p>Áp dụng hàm cor() trên data matrix 15 biến số, ta sẽ thu được kết quả là một correlation matrix với kích thước 15 x 15</p></li>
+<li><p>Sử dụng thư viện corrplot<span class="citation">(<a href="#ref-corrplot2021">Wei and Simko 2021</a>)</span> để chuyển ma trận tương quan này thành biểu đồ (có tên gọi là correlogram). Lưu ý rằng biểu đồ này đã giản lược kết quả từ ma trận tương quan có kích thước 15x15 bằng cách chỉ lấy 1 nửa dưới (vì ma trận có cấu trúc đối xứng) và loại bỏ đường chéo (toàn bộ giá trị r=1 trên đường chéo này, khi 1 biến tương quan với chính nó).</p></li>
+</ol>
+<p>Kết quả ma trận tương quan cho nhóm PCOS</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
+<p>Kết quả ma trận tương quan cho nhóm Normal</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
+<p>Ta có thể giản lược kết quả này nhiều hơn nữa, bằng cách chỉ giữ lại những cặp tương quan có ý nghĩa thống kê (p&lt;0.05), và chuyển những con số giá trị <span class="math inline">\(r\)</span> thành các biểu tượng, cho phép nhận diện nhanh hướng và độ mạnh tương quan.</p>
+<p>Đây là kết quả cho nhóm PCOS:</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
+<p>Còn đây là kết quả cho nhóm Normal</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
+<p>Ta thấy rằng ngay cả khi đã được giản lược tối đa và tối ưu hóa bằng màu sắc và biểu tượng, vẫn khó diễn giải trực tiếp kết quả phân tích tương quan cho tập hợp quá nhiều biến số. Mặt khác, hình thức trình bày kết quả này chỉ cho phép chúng ta suy diễn thống kê về độ mạnh và chiều hướng của mối tương quan giữa từng cặp biến, nhưng không cung cấp được bức tranh toàn cảnh về quan hệ phức tạp, chồng chéo giữa <em>tất cả</em> các biến.</p>
+<p>Trong phần tiếp theo, ta sẽ áp dụng phương pháp Network analysis, cho phép đi xa hơn và khai thác thêm nhiều thông tin hơn từ ma trận tương quan.</p>
+</div>
+<div id="sơ-đồ-mạng-lưới-tương-quan" class="section level2 hasAnchor" number="5.5">
+<h2><span class="header-section-number">5.5</span> Sơ đồ mạng lưới tương quan<a href="phân-tích-mạng-lưới-tương-quan.html#sơ-đồ-mạng-lưới-tương-quan" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Sơ đồ mạng lưới (network, graph) là một khái niệm giao thoa giữa nhiều chuyên ngành. Trong ngành khoa học máy tính, graph là một cấu trúc dữ liệu với công dụng mô phỏng các hệ thống tương tác trong xã hội đời thực (hội nhóm,mạng xã hội…), với khả năng truy xuất và tìm kiếm nhanh chóng một phần tử thông qua liên kết với những phần tử khác. Với thống kê và khoa học dữ liệu, graph vừa có ý nghĩa như một công cụ đồ họa, vừa là một mô hình toán học chính xác dẫn đến các ứng dụng như suy luận nhân quả, phân tích tương quan, thậm chí có thể được dùng làm dữ liệu đầu vào cho mô hình …</p>
+<p>Sơ đồ mạng là một tập hợp gồm 2 thành phần: các nút (vertices) và liên kết giữa chúng (edges, arcs). Trong y sinh học, mỗi nút (vertex) trong mạng lưới biểu thị cho một nhân tố. Nó có thể là một cấu trúc sinh học phân tử (genes, protein, một loại tế bào, thông số xét nghiệm sinh hóa, một đại lượng sinh học, một biến định lượng hoặc định tính. Liên kết giữa 2 nút (edge) trong mạng lưới có thể biểu thị cho mọi hình thức về mối liên hệ, với ý nghĩa thống kê hay hiện thực. Thí dụ: tương quan thống kê giữa 2 biến định lượng, liên hệ giữa thông số lâm sàng và xác suất bệnh lý, tương tác giữa phân tử truyền tin và thụ thể giữa 2 tế bào, tỉ lệ cùng hiện diện giữa 2 thực thể lâm sàng, vv.</p>
+<p>Trong giới hạn của chương này, ta sử dụng một ứng dụng cá biệt của sơ đồ mạng đó là mạng lưới tương quan (correlation network) như một phương tiện cho phép trình bày trực quan về mối liên hệ giữa các phần tử trong tập hợp nhiều biến số. Ngoài ra, ta có thể mô tả, so sánh đặc điểm của cấu trúc mạng lưới này giữa 2 trạng thái bình thường và bệnh lý. Trong mạng lưới tương quan, mỗi nút tương ứng với một biến số, và mỗi liên kết giữa 2 nút X,Y tương ứng với sự thiết lập mối tương quan tuyến tính giữa biến X và biến Y, sự hiện diện của liên kết được xác lập nhờ vào giá trị của r và p_value.</p>
+<p>Trong R, có 2 nhóm công cụ khác nhau cho Network analysis, đó là packages statnet<span class="citation">(<a href="#ref-statnet">Pavel N. Krivitsky et al. 2017</a>)</span> và igraph<span class="citation">(<a href="#ref-igraph">Csardi and Nepusz 2006</a>)</span>. Mỗi nhóm sử dụng dữ liệu có cấu trúc khác nhau (network và graph). Ta có thể hoán chuyển giữa graph và network bằng package intergraph. Một network hay graph có thể được dựng từ 2 cấu trúc dữ liệu cơ bản là “adjacency matrix”, hoặc “edges list”.</p>
+<p>Correlation matrix chính là một adjacency matrix. Đây là một ma trận đối xứng (mỗi hàng <span class="math inline">\(i\)</span> và mỗi cột <span class="math inline">\(j\)</span> tương ứng với 1 biến, và các ô giao nhau giữa chúng lưu giá trị hệ số tương quan <span class="math inline">\(r_{i,j}\)</span>). Khi chuyển thành sơ đồ mạng, thuật toán sẽ tạo ra các nút tương ứng với tập hợp biến, và thiết lập liên kết giữa 2 nút dựa vào ngưỡng cắt và tiêu chí ta đặt ra dựa trên giá trị của hệ số tương quan <span class="math inline">\(r_{i,j}\)</span>$.</p>
+<p>Quy trình phân tích mạng lưới tương quan khi dùng thư viện igraph gồm các bước sau:</p>
+<ol style="list-style-type: decimal">
+<li><p>Đầu tiên, ta dùng thư viện igraph để chuyển correlation matrix thành graph.</p></li>
+<li><p>Ta có thể tạo thêm một vài thuộc tính cho các mối nối liên kết trong mạng lưới như: Direction = hướng quan hệ, nhận giá trị “Proportional” nếu r&gt;0 (tương quan thuận), “Inverse” nếu r&lt;0 (tương quan nghịch); và Strength là một biến nhị phân về độ mạnh tương quan: Strong (tương quan mạnh) nếu abs(r) &gt;0.5 và Weak (tương quan yếu) nếu giá trị tuyệt đối này &lt;0.5.</p></li>
+<li><p>Chuyển mạng lưới thành hình ảnh</p></li>
+</ol>
+<p>Ta thử làm như vậy cho nhóm bệnh nhân PCOS và thu được kết quả như sau:</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-53-1.png" width="672" />
+Tuy nhiên, ta sẽ không làm việc trên graph mà sẽ chuyển nó thành network. Nguyên nhân vì định dạng dữ liệu network tương thích với hệ sinh thái statnet, cho phép chúng ta đi xa hơn với nhiều phân tích và mô hình mà hệ sinh thái này cung cấp.</p>
+<p>Ta dùng intergaph để chuyển graph object thành network object. Kết quả của mạng lưới tương quan cho nhóm PCOS như sau:</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
+<p>Trên network, ta còn có thể gán thêm thuộc tính cho các nút, thí dụ 15 biến số hiện thời có thể được phân thành 4 loại tùy ý nghĩa sinh lý của chúng: “A” tương ứng với thông số nhân trắc (anthropometric) như tuổi, BMI, “OV” tương ứng với các thông số về chức năng buồng trứng (Ovarian) như AFC, AMH, OSI, nhóm “Glu” tương ứng với các xét nghiệm về chuyển hóa glucose và insuline như đường huyết, HOMA-IR, và cuối cùng là nhóm “H” gồm các hormones sinh dục.</p>
+<p>Tương tự, ta thực hiện cùng quy trình trên cho nhóm Normal:</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+</div>
+<div id="phân-tích-cấu-trúc-mạng-lưới-tương-quan" class="section level2 hasAnchor" number="5.6">
+<h2><span class="header-section-number">5.6</span> Phân tích cấu trúc mạng lưới tương quan<a href="phân-tích-mạng-lưới-tương-quan.html#phân-tích-cấu-trúc-mạng-lưới-tương-quan" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Sơ đồ mạng không chỉ đơn giản là một hình vẽ trình bày ý tưởng, khái niệm về mạng lưới liên hệ giữa các biến, nhưng còn là một mô hình toán học chính xác về kích thước, cấu trúc phân bố của hệ thống các nút (node, vertex, actor) và mạng liên kết giữa chúng (edges, arcs).</p>
+<p>Hàm summary cho phép mô tả tóm tắt về cấu trúc của mạng lưới. Thí dụ cho mạng tương quan của nhóm PCOS, ta có kết quả mô tả như sau:</p>
+<pre><code>## Network attributes:
+##   vertices = 14
+##   directed = FALSE
+##   hyper = FALSE
+##   loops = FALSE
+##   multiple = FALSE
+##   bipartite = FALSE
+##  total edges = 31 
+##    missing edges = 0 
+##    non-missing edges = 31 
+##  density = 0.3406593 
+## 
+## Vertex attributes:
+## 
+##  Physio:
+##    character valued attribute
+##    attribute summary:
+##   A Glu   H  Ov 
+##   2   3   6   3 
+##   vertex.names:
+##    character valued attribute
+##    14 valid vertex names
+## 
+## Edge attributes:
+## 
+##  Direction:
+##    character valued attribute
+##    attribute summary:
+## Inv Pro 
+##  10  21 
+## 
+##  r:
+##    numeric valued attribute
+##    attribute summary:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## -0.2892 -0.1434  0.1467  0.1474  0.3337  0.9928 
+## 
+##  sig:
+##    numeric valued attribute
+##    attribute summary:
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## 0.000e+00 2.800e-07 3.563e-04 1.012e-02 2.074e-02 4.268e-02 
+## 
+##  Strength:
+##    character valued attribute
+##    attribute summary:
+## Strong   Weak 
+##      3     28</code></pre>
+<p>Mạng tương quan của nhóm PCOS có 14 nút. Thống kê cho thuộc tính của nút cho thấy có 2 biến nhân trắc, 3 biến về chuyển hóa Glucose, 6 biến hormones, 3 biến chức năng buồng trứng trong hệ thống tương quan. Kết quả thống kê cho các thuộc tính của liên kết (edges) cho thấy có tổng cộng 31 cặp tương quan, trong đó 10 cặp tương quan nghịch và 21 cặp tương quan thuận, 3 cặp tương quan mạnh và 28 cặp tương quan yếu. Giá trị hệ số r trung bình là 0.147, thấp nhất là -0.289, cao nhất là 0.993</p>
+<p>Với mạng tương quan cho nhóm Normal, ta có kết quả như sau:</p>
+<pre><code>## Network attributes:
+##   vertices = 11
+##   directed = FALSE
+##   hyper = FALSE
+##   loops = FALSE
+##   multiple = FALSE
+##   bipartite = FALSE
+##  total edges = 21 
+##    missing edges = 0 
+##    non-missing edges = 21 
+##  density = 0.3818182 
+## 
+## Vertex attributes:
+## 
+##  Physio:
+##    character valued attribute
+##    attribute summary:
+##   A Glu   H  Ov 
+##   1   3   4   3 
+##   vertex.names:
+##    character valued attribute
+##    11 valid vertex names
+## 
+## Edge attributes:
+## 
+##  Direction:
+##    character valued attribute
+##    attribute summary:
+## Inv Pro 
+##   7  14 
+## 
+##  r:
+##    numeric valued attribute
+##    attribute summary:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## -0.3028 -0.1865  0.2177  0.1555  0.3121  0.9802 
+## 
+##  sig:
+##    numeric valued attribute
+##    attribute summary:
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## 0.0000000 0.0002689 0.0021453 0.0110976 0.0206020 0.0370451 
+## 
+##  Strength:
+##    character valued attribute
+##    attribute summary:
+## Strong   Weak 
+##      2     19</code></pre>
+<p>Theo kết quả này, mạng lưới tương quan của nhóm Normal có kích thước nhỏ hơn (chỉ có 11 nút/biến số) và số cặp tương quan cũng ít hơn (chỉ 21 cặp), trong đó chủ yếu là tương quan thuận (14 cặp), có 2 liên kết tương quan mạnh và 19 cặp tương quan yếu.</p>
+<p>Cũng trong kết quả này, ta có mật độ của mạng lưới (density), cho phép hình dung về khả năng liên kết giữa các phần tử trong tập hợp. Ta thấy rằng tuy mạng tương quan ở nhóm bình thường có kích thước nhỏ hơn (11 so với 14) nhưng mật độ cao liên kết cao hơn (0.382 so với 0.340)</p>
+<p>Sự khác biệt về cấu trúc giữa 2 mạng lưới tương quan cho thấy một điều thú vị, đó là chúng ta vẫn thường hiểu sai về mục tiêu cách diễn giải kết quả của phân tích tương quan. Tâm lý chung của nghiên cứu sinh thường trông đợi phát hiện sự tồn tại mối liên hệ có ý nghĩa thống kê giữa 2 yếu tố bất kì, và cho rằng đó là kết quả tốt. Tuy nhiên, thực tế có thể phức tạp hơn nhiều. Khi chuyển từ trạng thái sinh lý bình thường sang bệnh lý, có thể chỉ một trong 2, hay cả 2 biến số bị thay đổi giá trị, sự thay đổi này có thể thuận chiều hay nghịch chiều. Do đó, một rối loạn bệnh lý có thể biểu hiện theo nhiều cách: hoặc phát sinh một mối tương quan mà bình thường không có, hoặc ngược lại: làm đứt gãy hoặc tăng cường/giảm nhẹ, đảo chiều một mối liên hệ có sẵn.</p>
+<p>Một số thuộc tính khác về cấu trúc mà ta có thể ước tính từ mạng lưới, bao gồm:</p>
+<p>Đường kính của mạng lưới là con đường nối từ đầu này sang đầu kia trong mạng lưới. Ở đây, cả 2 nhóm PCOS và Normal đều có đường kính mạng lưới là 3.</p>
+<pre><code>## [1] 3</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>Chỉ số Transitivity: tỉ lệ giữa số liên kết bộ ba khép kín trên tổng số liên kết bộ ba hở và kín</p>
+<pre><code>## [1] 0.4662162</code></pre>
+<pre><code>## [1] 0.4761905</code></pre>
+<p>Mạng của nhóm Normal có tỉ số transitivity cao hơn (0.48 so với 0.47), cho thấy nó có nhiều liên kết bộ ba hơn so với mạng tương quan của nhóm PCOS.</p>
+<p>Ngoài ra, mạng lưới tương quan còn cho phép nhận diện thông số lâm sàng nào có vai trò trung tâm, đóng góp quan trọng vào việc kiến tạo mạng liên kết với những biến còn lại, từ đó trả lời câu hỏi: đại lượng nào là quan trọng nhất trong toàn bộ các thông số đang được nghiên cứu ?</p>
+<p>Một phần tử có vai trò trung tâm khi nó có nhiều liên hệ nhất với các phần tử khác trong mạng lưới. Có nhiều chỉ số để ước lượng tính Trung tâm này, như: Degree, Betweeness, Closeness, Eigen vector, Bonacich power, Information, Harary graph. Ở mỗi trạng thái khác nhau: Bệnh lý/Bình thường, mỗi biến có vai trò khác nhau trong việc kiến tạo ra mạng lưới quan hệ với các biến còn lại.</p>
+<p>Sau đây là kết quả mô tả về vai trò quan trọng của mỗi loại biến số trong mạng lưới tương quan của 2 nhóm.</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<p>Thí dụ, ta có thể phát hiện ra phần tử then chốt “cut-point” , có nghĩa là khi loại bỏ phần tử này, cấu trúc mạng lưới sẽ bị phân rã, chia cắt thành 2 hay nhiều cụm. Thí dụ cho nhóm PCOS, thông số then chốt là BMI. Điều này tương tự như khi ta nhận diện một thành viên chủ chốt trong một hội nhóm trong đời thực.</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<p>Qua thí dụ minh họa này, ta có thể hình dung rằng mục tiêu của phân tích hiện thời đã vượt xa hơn câu hỏi đơn giản ban đầu rằng liệu có tồn tại hay không mối liên hệ giữa 2 thông số lâm sàng. Mạng lưới tương quan cho phép chúng ta khảo sát một cách định lượng về những khái niệm trừu tượng như: khả năng liên kết của một nhân tố với những nhân tố khác (qua đó vai trò của nó trở nên quan trọng), kích thước của cụm nhân tố liên hệ với nhau, sự thay đổi về mô thức của cấu trúc liên kết giữa các nhân tố bên trong hệ thống trong điều kiện bệnh lý…</p>
+<p>Những thông tin này có thể dẫn đến ứng dụng trong thực hành lâm sàng, thí dụ đơn giản nhất là nhận diện một nhóm biomarker (thông số xét nghiệm) có ý nghĩa đại diện và hiệu quả cho mục tiêu chẩn đoán hoặc đánh giá độ nặng của bệnh lý.</p>
+</div>
+<div id="yếu-tố-mỹ-thuật" class="section level2 hasAnchor" number="5.7">
+<h2><span class="header-section-number">5.7</span> Yếu tố mỹ thuật<a href="phân-tích-mạng-lưới-tương-quan.html#yếu-tố-mỹ-thuật" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Có nhiều hình thức trình bày mạng lưới tương quan, sau đây là 6 kiểu thông dụng nhất áp dụng cho mạng tương quan của nhóm PCOS:</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p>Ta có thể thấy rằng 3 kiểu trình bày: mạng lưới vòng (Circle), Kamadakawai và Fruchterman-Reingold là rõ ràng và đẹp nhất.</p>
+<p>Sơ đồ mạng có thể truyền tải nhiều thông tin qua các kênh khác nhau: Kích thước của nút có thể mã hóa cho một biến định lượng, màu sắc của nút có thể biểu thị biến định tính (phân loại), kích thước và màu sắc của liên kết có thể trình bày về độ mạnh, chiều hướng hoặc bản chất của mối tương quan giữa 2 nút.</p>
+<p>Ta có thể tùy chỉnh kích thước và màu của nút theo thuộc tính của nó: thí dụ 3 chỉ số Degree, Closeness và Betweeness đo lường mức độ quan trọng (khả năng kiến tạo liên kết) của mỗi nút.</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+<p>Tương tự, ta có thể tùy chỉnh màu sắc, dán nhãn cho các liên kết (cặp tương quan) tùy theo các thuộc tính, thí dụ độ mạnh, chiều hướng của tương quan.</p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
+<p><img src="statistics-ivf-research_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+</div>
+<div id="thông-điệp-rút-gọn-làm-hành-trang-3" class="section level2 hasAnchor" number="5.8">
+<h2><span class="header-section-number">5.8</span> Thông điệp rút gọn làm hành trang<a href="phân-tích-mạng-lưới-tương-quan.html#thông-điệp-rút-gọn-làm-hành-trang-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li><p>Khi nghiên cứu về một hệ thống sinh lý hoặc thực thể bệnh lý, ta nên tiếp cận một cách toàn diện và đặt mỗi nhân tố vào mạng lưới liên hệ - tương tác phức tạp với những nhân tố khác, thay vì chỉ khảo sát từng đối tượng riêng biệt.</p></li>
+<li><p>Có thể kết hợp giữa phân tích tương quan cổ điển và Network analysis để tạo ra Correlation network, một công cụ hữu ích cho phép khảo sát trực quan và định lượng cấu trúc liên hệ đa chiều giữa các đại lượng, nhân tố trong hệ thống và thực thể bệnh lý.</p></li>
+<li><p>Bất thường và rối loạn không chỉ biểu hiện qua sự thay đổi giá trị của một số đại lượng sinh học chuyên biệt, mà còn làm thay đổi cấu trúc của mạng lưới liên hệ giữa chúng và các nhân tố khác trong hệ thống.</p></li>
+</ol>
+
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-igraph" class="csl-entry">
+Csardi, Gabor, and Tamas Nepusz. 2006. <span>“The Igraph Software Package for Complex Network Research.”</span> <em>InterJournal</em> Complex Systems: 1695. <a href="https://igraph.org">https://igraph.org</a>.
+</div>
+<div id="ref-statnet" class="csl-entry">
+Pavel N. Krivitsky, Mark S. Handcock, David R. Hunter, Carter T. Butts, Chad Klumb, Steven M. Goodreau, and Martina Morris. 2017. <em>Statnet: Tools for the Statistical Modeling of Network Data</em>. Statnet Development Team. <a href="https://statnet.org">https://statnet.org</a>.
+</div>
+<div id="ref-corrplot2021" class="csl-entry">
+Wei, Taiyun, and Viliam Simko. 2021. <em>R Package ’Corrplot’: Visualization of a Correlation Matrix</em>. <a href="https://github.com/taiyun/corrplot">https://github.com/taiyun/corrplot</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="khảo-sát-kết-cục-số-đếm-hồi-quy-negative-binomial.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="khảo-sát-kết-cục-là-tỷ-lệ-hồi-quy-binomial.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/kinokoberuji/OGStats/edit/master/04-Correlation_network.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["statistics-ivf-research.pdf", "statistics-ivf-research.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
